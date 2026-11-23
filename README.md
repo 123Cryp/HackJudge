@@ -60,4 +60,4 @@ python3 -m unittest discover -s tests -v
 
 ## Uploading from a phone
 
-The workflow in `.github/workflows/unzip.yml` unpacks a project zip: upload the project zip to the repository root. The workflow unpacks it, removes the zip and commits the files. Do the same with `ci/tests.yml` to run the tests on every push.
+The workflow in `.github/workflows/unzip.yml` unpacks a project zip: upload the project zip to the repository root. The workflow unpacks it, removes the zip and commits the files. The tests workflow in `.github/workflows/tests.yml` runs on every push.
