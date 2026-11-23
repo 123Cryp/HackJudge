@@ -1,0 +1,41 @@
+name: Unzip uploaded zip
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "*.zip"
+
+permissions:
+  contents: write
+
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Unpack every zip at the repository root
+        run: |
+          shopt -s nullglob
+          zips=(*.zip)
+          if [ ${#zips[@]} -eq 0 ]; then echo "No zip at the root, nothing to do"; exit 0; fi
+          for z in "${zips[@]}"; do
+            tmp=$(mktemp -d)
+            unzip -q -o "$z" -d "$tmp"
+            entries=("$tmp"/*)
+            if [ ${#entries[@]} -eq 1 ] && [ -d "${entries[0]}" ]; then src="${entries[0]}"; else src="$tmp"; fi
+            cp -a "$src"/. .
+            rm -f "$z"
+            rm -rf "$tmp"
+          done
+
+      - name: Commit the unpacked files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then echo "No changes"; exit 0; fi
+          git commit -m "Unpack uploaded zip"
+          git push

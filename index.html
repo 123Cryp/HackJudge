@@ -1,0 +1,1403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#ECEFF3" id="themeColor">
+<script>try{var t=localStorage.getItem("hackjudge.theme");if(t!=="light"&&t!=="dark")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme="light";}</script>
+<meta name="description" content="HackJudge: hackathon prize pools on GenLayer, scored by validators against a public rubric, with appeals and automatic payouts.">
+<title>HackJudge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --ground:#ECEFF3; --surface:#FFFFFF; --surface-2:#F5F7F9; --ink:#131B24; --ink-2:#435060; --ink-3:#5B6775;
+  --line:#D5DBE2; --line-2:#C3CBD4;
+  --accent:#0B6E69; --accent-hover:#085954; --on-accent:#FFFFFF; --accent-soft:#E2F0EE; --accent-line:#9CCBC5;
+  --ok:#1D6B40; --ok-soft:#E3F1E8; --warn:#8A5A00; --warn-soft:#FBF0DA; --bad:#A8261B; --bad-soft:#F8E4E1;
+  --info:#355A8C; --info-soft:#E5ECF6; --neutral-soft:#E9EDF1;
+  --shadow:0 1px 2px rgba(19,27,36,.06),0 2px 6px rgba(19,27,36,.04);
+  --shadow-pop:0 14px 40px rgba(19,27,36,.18);
+  --font:"Public Sans",ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --r-sm:6px; --r-md:10px; --r-lg:14px;
+  --nav-h:62px; --side-w:232px;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --ground:#0C0F14; --surface:#151A21; --surface-2:#1A2029; --ink:#E8ECF2; --ink-2:#AAB4C1; --ink-3:#8D98A6;
+  --line:#262E39; --line-2:#333D4A;
+  --accent:#4FCDBF; --accent-hover:#74DACE; --on-accent:#052A27; --accent-soft:#12302D; --accent-line:#24574F;
+  --ok:#6FD39A; --ok-soft:#14301F; --warn:#F2BC57; --warn-soft:#33270F; --bad:#F48D80; --bad-soft:#3A1B18;
+  --info:#93B4E2; --info-soft:#1A2638; --neutral-soft:#1F2630;
+  --shadow:0 1px 2px rgba(0,0,0,.35); --shadow-pop:0 16px 48px rgba(0,0,0,.55);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  min-height:100vh;overflow-x:hidden;padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom))}
+h1,h2,h3{margin:0;line-height:1.2;letter-spacing:-.018em}
+h1{font-size:clamp(24px,4.4vw,30px);font-weight:700}
+h2{font-size:19px;font-weight:700}
+h3{font-size:16px;font-weight:650}
+p{margin:0}
+a{color:var(--accent);text-underline-offset:3px}
+a:hover{color:var(--accent-hover)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;left:8px;top:-60px;z-index:100;background:var(--ink);color:var(--ground);padding:10px 14px;border-radius:var(--r-sm)}
+.skip:focus{top:8px}
+svg.ic{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.num{font-variant-numeric:tabular-nums}
+
+/* frame */
+.topbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;height:56px;padding:0 14px;background:var(--surface);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:700;font-size:18px;letter-spacing:-.02em;min-height:44px;flex:none}
+.brand:hover{color:var(--ink)}
+.mark{width:28px;height:28px;display:block;flex:none}
+.grow{flex:1}
+.iconbtn{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--surface);color:var(--ink-2);cursor:pointer;flex:none}
+.iconbtn:hover{color:var(--ink);border-color:var(--line-2)}
+.walletbtn{display:inline-flex;align-items:center;gap:8px;min-height:40px;min-width:0;max-width:58vw;padding:0 12px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink);
+  border-radius:var(--r-sm);font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.walletbtn:hover{border-color:var(--ink-3)}
+.walletbtn .lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.walletbtn .dot{width:8px;height:8px;border-radius:50%;background:var(--ink-3);flex:none}
+.walletbtn.on .dot{background:var(--ok)}
+.walletbtn.warn .dot{background:var(--warn)}
+.banner{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 14px;background:var(--warn-soft);color:var(--warn);border-bottom:1px solid var(--line);font-size:14px;font-weight:600}
+.banner[hidden]{display:none}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs ul{list-style:none;margin:0;padding:4px 6px;display:grid;grid-template-columns:repeat(4,1fr);gap:2px;height:var(--nav-h)}
+nav.tabs a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;height:100%;border-radius:var(--r-md);color:var(--ink-3);text-decoration:none;font-size:11.5px;font-weight:600;border:1px solid transparent}
+nav.tabs a:hover{color:var(--ink)}
+nav.tabs a[aria-current="page"]{color:var(--ink)}
+nav.tabs a[aria-current="page"] svg{color:var(--accent)}
+nav.tabs .side-brand,nav.tabs .side-foot{display:none}
+main{padding:20px 14px 48px;max-width:1140px;margin:0 auto;min-height:70vh}
+main:focus{outline:none}
+footer.foot{max-width:1140px;margin:0 auto;padding:0 14px 32px;font-size:12.5px;color:var(--ink-3)}
+footer.foot p+p{margin-top:4px}
+@media (min-width:1024px){
+  body{padding-bottom:0;padding-left:var(--side-w)}
+  .topbar{padding:0 32px}
+  .topbar .brand{display:none}
+  .walletbtn{max-width:340px}
+  nav.tabs{top:0;right:auto;width:var(--side-w);bottom:0;border-top:0;border-right:1px solid var(--line);padding:12px;display:flex;flex-direction:column}
+  nav.tabs .side-brand{display:flex;padding:0 10px}
+  nav.tabs .side-foot{display:block;margin-top:auto;padding:10px;font-size:12.5px;color:var(--ink-3)}
+  nav.tabs ul{display:flex;flex-direction:column;height:auto;padding:18px 0;gap:4px}
+  nav.tabs a{flex-direction:row;justify-content:flex-start;gap:12px;height:42px;padding:0 12px;font-size:14.5px}
+  nav.tabs a[aria-current="page"]{border-color:var(--line-2);background:var(--surface-2)}
+  main{padding:32px 32px 56px}
+  footer.foot{padding:0 32px 32px}
+}
+
+/* primitives */
+.stack>*+*{margin-top:16px}
+.row{display:flex;align-items:center;gap:12px}
+.between{justify-content:space-between}
+.wrap{flex-wrap:wrap}
+.muted{color:var(--ink-2)}
+.small{font-size:14px}
+.xs{font-size:12.5px;color:var(--ink-3)}
+.addr{word-break:break-all}
+.measure{max-width:64ch}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px;box-shadow:var(--shadow)}
+.panel>h2+*{margin-top:12px}
+.inset{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-md);padding:14px}
+.pagehead{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.pagehead p{margin-top:6px;color:var(--ink-2);max-width:62ch}
+.section{margin-top:40px}
+.sechead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.sechead h2{font-size:21px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:var(--r-sm);border:1px solid transparent;font:inherit;font-size:15px;font-weight:650;
+  text-decoration:none;cursor:pointer;white-space:nowrap}
+.btn-primary{background:var(--accent);color:var(--on-accent)}
+.btn-primary:hover{background:var(--accent-hover);color:var(--on-accent)}
+.btn-secondary{background:var(--surface);color:var(--ink);border-color:var(--line-2)}
+.btn-secondary:hover{border-color:var(--ink-3);color:var(--ink)}
+.btn-quiet{background:transparent;color:var(--accent);padding:0 10px}
+.btn-quiet:hover{background:var(--accent-soft)}
+.btn-danger{background:var(--surface);color:var(--bad);border-color:color-mix(in srgb,var(--bad) 45%,var(--line))}
+.btn-danger:hover{background:var(--bad-soft);color:var(--bad)}
+.btn.sm{min-height:38px;padding:0 12px;font-size:14px}
+.btn.block{width:100%}
+.btn[disabled],.btn[aria-disabled="true"]{opacity:.55;cursor:not-allowed;pointer-events:none}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.spin{width:16px;height:16px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:2px 9px;border-radius:999px;font-size:12.5px;font-weight:600;background:var(--neutral-soft);color:var(--ink-2);white-space:nowrap}
+.chip::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.chip.ok{background:var(--ok-soft);color:var(--ok)} .chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)} .chip.info{background:var(--info-soft);color:var(--info)}
+.tag{display:inline-block;padding:2px 8px;border-radius:var(--r-sm);border:1px solid var(--line);font-size:12.5px;color:var(--ink-2);background:var(--surface-2)}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.skel{border-radius:var(--r-md);background:var(--neutral-soft);animation:sk 1.4s ease infinite}
+@keyframes sk{50%{opacity:.55}}
+.empty{text-align:center;padding:28px 16px;color:var(--ink-2)}
+.empty h3{color:var(--ink);margin-bottom:6px}
+.empty .btn{margin-top:14px}
+.err{color:var(--bad);font-size:14px;margin-top:8px}
+.err:empty{display:none}
+.callout{padding:12px 14px;border-radius:var(--r-md);background:var(--accent-soft);color:var(--ink);border:1px solid var(--accent-line)}
+.callout.warn{background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 35%,var(--line))}
+dl.dl{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;margin:0;font-size:14px}
+dl.dl dt{color:var(--ink-3)}
+dl.dl dd{margin:0;text-align:right;font-weight:600;min-width:0;overflow-wrap:anywhere}
+
+/* forms */
+.field+.field{margin-top:14px}
+.field label,.field .lab{display:block;font-size:14px;font-weight:650;margin-bottom:6px}
+.help{font-size:12.5px;color:var(--ink-3);margin-top:5px}
+.input,textarea.input{width:100%;min-height:44px;padding:10px 12px;border-radius:var(--r-sm);border:1px solid var(--line-2);background:var(--surface);color:var(--ink);font:inherit;font-size:16px}
+textarea.input{min-height:84px;resize:vertical}
+.input:focus{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
+.input[aria-invalid="true"]{border-color:var(--bad)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.pick{min-height:38px;padding:0 13px;border-radius:999px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink);font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.pick:hover{border-color:var(--ink-3)}
+.pick[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+.crit{display:grid;grid-template-columns:minmax(0,1fr) 84px 40px;gap:8px;align-items:start;padding:12px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface-2)}
+.crit+.crit{margin-top:8px}
+.crit .detail{grid-column:1/-1}
+.crit .input{min-height:42px}
+.wsum{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:14px}
+.wbar{flex:1;height:8px;border-radius:99px;background:var(--neutral-soft);overflow:hidden;display:flex}
+.wbar i{display:block;height:100%;background:var(--accent)}
+.wbar i:nth-child(2n){opacity:.65}
+.option{display:block;width:100%;text-align:left;padding:14px;border-radius:var(--r-md);border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;cursor:pointer}
+.option+.option{margin-top:8px}
+.option:hover{border-color:var(--accent)}
+.option b{display:block;font-size:15px}
+.option span{display:block;font-size:13px;color:var(--ink-2);margin-top:2px}
+details.tune{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+details.tune summary{cursor:pointer;font-weight:650;font-size:14px;min-height:40px;display:flex;align-items:center}
+.tune-body{padding-top:8px}
+
+/* dialog, toasts, tracker */
+dialog{border:0;padding:0;background:transparent;max-width:min(520px,calc(100vw - 24px));width:100%;color:var(--ink)}
+dialog::backdrop{background:rgba(10,14,20,.5)}
+.dlg{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;box-shadow:var(--shadow-pop);max-height:86vh;overflow:auto}
+.dlg-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.dlg-head .x{width:40px;height:40px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--surface);color:var(--ink-2);display:grid;place-items:center;cursor:pointer}
+@media (max-width:599px){dialog{margin:auto 0 0;max-width:100vw}.dlg{border-radius:var(--r-lg) var(--r-lg) 0 0;padding-bottom:calc(20px + env(safe-area-inset-bottom))}}
+.toasts{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--nav-h) + 14px + env(safe-area-inset-bottom));z-index:60;display:grid;gap:8px;width:min(440px,calc(100vw - 24px))}
+@media (min-width:1024px){.toasts{bottom:24px;left:auto;right:24px;transform:none}}
+.toast{background:var(--ink);color:var(--ground);border-radius:var(--r-md);padding:12px 14px;font-size:14px;font-weight:600;box-shadow:var(--shadow-pop);animation:tin .2s ease both}
+.toast.bad{background:var(--bad);color:#fff}
+@keyframes tin{from{opacity:0;transform:translateY(6px)}}
+.tx{margin-top:14px;padding:14px;border-radius:var(--r-md);border:1px solid var(--line);background:var(--surface-2)}
+.tx[hidden]{display:none}
+.tx ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.tx li{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--ink-3);font-weight:600;min-width:0}
+.tx li .b{height:4px;border-radius:99px;background:var(--line-2)}
+.tx li.done{color:var(--ink-2)} .tx li.done .b{background:var(--accent)}
+.tx li.now{color:var(--ink)} .tx li.now .b{background:var(--accent);opacity:.5;animation:pulse 1.2s ease infinite}
+.tx li.fail{color:var(--bad)} .tx li.fail .b{background:var(--bad)}
+@keyframes pulse{50%{opacity:1}}
+.tx .msg{margin-top:12px;font-size:14px;color:var(--ink-2)}
+.tx .msg:empty{display:none}
+.tx.bad{border-color:color-mix(in srgb,var(--bad) 40%,var(--line));background:var(--bad-soft)}
+.tx.bad .msg b{color:var(--bad)}
+.tx .msg .btn{margin-top:10px}
+
+/* home */
+.hero{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);overflow:hidden}
+.hero-grid{display:grid;gap:18px;padding:22px 18px 18px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:860px){.hero-grid{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);padding:34px 34px 26px;align-items:center}}
+.live{display:inline-flex;align-items:center;gap:8px;padding:4px 11px 4px 9px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2);font-size:13px;color:var(--ink-2);font-weight:600}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
+.live b{color:var(--ink)}
+.hero h1{font-size:clamp(26px,5vw,36px);letter-spacing:-.025em;margin-top:14px;max-width:18ch}
+.lede{margin-top:12px;color:var(--ink-2);font-size:16.5px;max-width:52ch}
+.hero .actions{margin-top:20px}
+.hero-art{display:flex;justify-content:center}
+.hero-art svg{width:100%;max-width:380px;height:auto}
+.hero-art .bar{transform-origin:left center;transform:scaleX(0);animation:fill .9s cubic-bezier(.2,.7,.2,1) forwards}
+.hero-art .bar.b2{animation-delay:.15s}.hero-art .bar.b3{animation-delay:.3s}.hero-art .bar.b4{animation-delay:.45s}
+.hero-art .ribbon{opacity:0;transform-origin:300px 70px;animation:stamp .5s .85s cubic-bezier(.2,.9,.3,1.3) forwards}
+@keyframes fill{to{transform:scaleX(1)}}
+@keyframes stamp{from{opacity:0;transform:scale(1.4) rotate(-12deg)}to{opacity:1;transform:none}}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--line);margin:0}
+@media (min-width:760px){.stats{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.stats>div{padding:14px 18px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);min-width:0}
+@media (min-width:760px){.stats>div{border-bottom:0}.stats>div:last-child{border-right:0}}
+@media (max-width:759px){.stats>div:nth-child(2n){border-right:0}.stats>div:nth-child(n+3){border-bottom:0}}
+.stats dt{font-size:13px;color:var(--ink-3);font-weight:600}
+.stats dd{margin:2px 0 0;font-size:22px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.stats dd small{font-size:13px;color:var(--ink-3);font-weight:600;margin-left:4px}
+.stats .sub{display:block;font-size:12.5px;font-weight:600;margin-top:2px}
+.sub.ok{color:var(--ok)}.sub.warn{color:var(--warn)}.sub.info{color:var(--info)}.sub.acc{color:var(--accent)}
+.feed ol{list-style:none;margin:0;padding:0}
+.feed li+li{border-top:1px solid var(--line)}
+.feed li a{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 4px;min-height:56px;text-decoration:none;color:var(--ink);border-radius:var(--r-sm)}
+.feed li a:hover{background:var(--surface-2)}
+.ev-i{width:36px;height:36px;border-radius:var(--r-md);display:grid;place-items:center;background:var(--neutral-soft);color:var(--ink-2)}
+.ev-i.acc{background:var(--accent-soft);color:var(--accent)} .ev-i.ok{background:var(--ok-soft);color:var(--ok)}
+.ev-i.warn{background:var(--warn-soft);color:var(--warn)} .ev-i.bad{background:var(--bad-soft);color:var(--bad)} .ev-i.info{background:var(--info-soft);color:var(--info)}
+.ev-t{display:block;font-size:14.5px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ev-s{display:block;font-size:12.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ev-a{font-size:12.5px;color:var(--ink-3);white-space:nowrap}
+.feed-foot{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:8px;padding-top:14px;border-top:1px solid var(--line-2)}
+@media (min-width:760px){.feed-foot{grid-template-columns:repeat(3,minmax(0,1fr)) auto;align-items:center}}
+.feed-foot b{display:block;font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
+.feed-foot span{display:block;font-size:12.5px;color:var(--ink-3)}
+.feed-foot .bal{grid-column:1/-1;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:var(--r-md);background:var(--ok-soft)}
+@media (min-width:760px){.feed-foot .bal{grid-column:auto}}
+.feed-foot .bal b{color:var(--ok);display:inline-flex;align-items:center;gap:6px;font-size:15px}
+.feed-foot .bal span{display:inline}
+.feed-foot .bal.off{background:var(--bad-soft)} .feed-foot .bal.off b{color:var(--bad)}
+.roles{display:grid;gap:10px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:760px){.roles{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.role{display:grid;grid-template-columns:48px minmax(0,1fr) 20px;gap:14px;align-items:center;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+  box-shadow:var(--shadow);text-decoration:none;color:var(--ink);min-height:84px}
+.role:hover{border-color:var(--accent);color:var(--ink)}
+.role .tile{width:48px;height:48px;border-radius:var(--r-md);background:var(--accent-soft);color:var(--accent);display:grid;place-items:center}
+.role .tile svg{width:34px;height:34px}
+.role b{display:block;font-size:16px}
+.role span.d{display:block;font-size:13.5px;color:var(--ink-2);margin-top:2px}
+.role>svg.ic{color:var(--ink-3)}
+.role:hover>svg.ic{color:var(--accent)}
+.sentence{font-size:clamp(18px,3.4vw,22px);line-height:2.15;font-weight:600;letter-spacing:-.01em;max-width:46ch}
+.tok{display:inline-flex;align-items:center;gap:4px;min-height:38px;padding:0 12px;margin:0 2px;border-radius:var(--r-sm);border:1px dashed var(--accent);background:var(--accent-soft);color:var(--ink);
+  font:inherit;font-size:.92em;font-weight:650;cursor:pointer;line-height:1.2;vertical-align:baseline}
+.tok:hover{border-style:solid}
+.tok svg.ic{width:14px;height:14px;color:var(--accent)}
+details.how>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px}
+details.how>summary::-webkit-details-marker{display:none}
+details.how>summary h2{font-size:21px}
+details.how>summary .ic{transition:transform .2s}
+details.how[open]>summary .ic{transform:rotate(180deg)}
+.steps{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:10px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:760px){.steps{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.steps li{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px;box-shadow:var(--shadow)}
+.steps .n{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--on-accent);font-weight:700;font-size:14px;margin-bottom:10px}
+.steps p{font-size:14px;color:var(--ink-2);margin-top:4px}
+
+/* hackathon cards */
+.grid{display:grid;gap:12px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:700px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:1200px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.hcard{--edge:var(--line-2);position:relative;display:flex;flex-direction:column;gap:10px;padding:16px;background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--edge);
+  border-radius:var(--r-lg);box-shadow:var(--shadow);text-decoration:none;color:var(--ink);min-width:0}
+.hcard:hover{border-color:var(--line-2);border-top-color:var(--edge);color:var(--ink)}
+.hcard.ok{--edge:var(--ok)}.hcard.warn{--edge:var(--warn)}.hcard.info{--edge:var(--info)}.hcard.bad{--edge:var(--bad)}.hcard.neutral{--edge:var(--ink-3)}
+.hcard h3{font-size:17px;overflow-wrap:anywhere}
+.hcard .prize{font-size:24px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.hcard .prize small{font-size:13px;color:var(--ink-3);margin-left:4px}
+.hcard .meta{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--ink-2)}
+.hcard .meta span{display:inline-flex;align-items:center;gap:5px}
+.hcard .meta svg.ic{width:15px;height:15px;color:var(--ink-3)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+
+/* detail */
+.detail{display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
+.detail .side{order:-1}
+@media (min-width:1024px){.detail{grid-template-columns:minmax(0,1fr) 360px;align-items:start}.detail .side{order:0;position:sticky;top:76px}}
+.dhead{display:flex;flex-direction:column;gap:10px}
+.dhead .row{flex-wrap:wrap}
+.bigprize{display:flex;align-items:baseline;gap:6px;font-size:30px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.bigprize small{font-size:14px;color:var(--ink-3)}
+.split{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.split div{padding:10px;border-radius:var(--r-md);background:var(--surface-2);border:1px solid var(--line);min-width:0}
+.split b{display:block;font-size:15px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.split span{font-size:12.5px;color:var(--ink-3)}
+.phases{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.phases li{font-size:12.5px;color:var(--ink-3);font-weight:600;min-width:0}
+.phases li::before{content:"";display:block;height:4px;border-radius:99px;background:var(--line-2);margin-bottom:6px}
+.phases li.done::before{background:var(--accent)} .phases li.now{color:var(--ink)} .phases li.now::before{background:var(--accent);opacity:.55}
+.phases li small{display:block;font-weight:500;color:var(--ink-3)}
+.rubric{list-style:none;margin:0;padding:0}
+.rubric li{padding:10px 0}
+.rubric li+li{border-top:1px solid var(--line)}
+.rubric .rt{display:flex;justify-content:space-between;gap:12px;font-weight:650;font-size:15px}
+.rubric .rd{font-size:13.5px;color:var(--ink-2);margin-top:2px}
+.meter{height:6px;border-radius:99px;background:var(--neutral-soft);overflow:hidden;margin-top:8px}
+.meter i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.rank{display:inline-grid;place-items:center;min-width:28px;height:28px;padding:0 6px;border-radius:var(--r-sm);font-weight:700;font-size:14px;background:var(--neutral-soft);color:var(--ink-2)}
+.rank.top{background:var(--accent);color:var(--on-accent)}
+table.board{width:100%;border-collapse:collapse;font-size:14px}
+table.board th{text-align:left;font-size:12.5px;color:var(--ink-3);font-weight:600;padding:8px 8px;border-bottom:1px solid var(--line-2);white-space:nowrap}
+table.board td{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+table.board tr:last-child td{border-bottom:0}
+table.board td.r,table.board th.r{text-align:right}
+table.board a{color:var(--ink);font-weight:650;text-decoration:none;display:inline-flex;align-items:center;min-height:36px}
+table.board a:hover{color:var(--accent)}
+.only-wide{display:none}
+@media (min-width:760px){.only-wide{display:table}.only-narrow{display:none}}
+.rows{list-style:none;margin:0;padding:0}
+.rows li+li{border-top:1px solid var(--line)}
+.rows a{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 2px;text-decoration:none;color:var(--ink);min-height:60px}
+.rows .t{display:block;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rows .s{display:block;font-size:12.5px;color:var(--ink-3)}
+.rows .e{text-align:right}
+.rows .e b{display:block;font-variant-numeric:tabular-nums}
+.score{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:12px 0}
+.score+.score{border-top:1px solid var(--line)}
+.score .nm{font-weight:650}
+.score .v{font-weight:700;font-variant-numeric:tabular-nums}
+.score .meter{grid-column:1/-1;margin-top:2px}
+.score .why{grid-column:1/-1;font-size:13.5px;color:var(--ink-2)}
+.cmp{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.cmp>div{padding:12px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface-2)}
+.cmp b{display:block;font-size:22px;font-variant-numeric:tabular-nums}
+.linkrow{display:flex;align-items:center;gap:10px;min-height:44px;padding:6px 0;text-decoration:none;color:var(--ink);overflow:hidden}
+.linkrow span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.linkrow svg.ic{color:var(--accent)}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#app">Skip to content</a>
+<header class="topbar">
+  <a class="brand" href="#/" aria-label="HackJudge home"><span class="markslot"></span><span>HackJudge</span></a>
+  <span class="grow"></span>
+  <button class="iconbtn" id="themeBtn" type="button" aria-label="Switch theme"></button>
+  <button class="walletbtn" id="walletBtn" type="button" aria-haspopup="dialog"><span class="dot" aria-hidden="true"></span><span class="lbl" id="walletLbl">Connect wallet</span></button>
+</header>
+<div class="banner" id="netBanner" role="alert" hidden>
+  <span class="grow">Your wallet is on another network. Transactions fail until it uses GenLayer Studio.</span>
+  <button class="btn btn-secondary sm" type="button" id="switchNet">Switch network</button>
+</div>
+<nav class="tabs" aria-label="Main">
+  <a class="brand side-brand" href="#/" aria-label="HackJudge home"><span class="markslot"></span><span>HackJudge</span></a>
+  <ul id="tabs"></ul>
+  <p class="side-foot" id="sideFoot">GenLayer Studio</p>
+</nav>
+<main id="app" tabindex="-1"></main>
+<footer class="foot">
+  <p>Contract <span class="addr" id="footAddr">not set</span> on GenLayer Studio.</p>
+  <p>Scores come from validators reading each team's README and demo page against the hackathon's public rubric.</p>
+</footer>
+<dialog id="dlg" aria-labelledby="dlgTitle"><div class="dlg" id="dlgBody"></div></dialog>
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+<script type="module">
+import { createClient, createAccount } from "https://esm.sh/genlayer-js@latest";
+import { studionet } from "https://esm.sh/genlayer-js@latest/chains";
+
+const DEFAULT_CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000";
+const ZERO = "0x0000000000000000000000000000000000000000";
+const WEI = 1000000000000000000n;
+const $ = (id) => document.getElementById(id);
+
+/* ---------- dom helpers ---------- */
+function h(tag, props, ...kids) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(props || {})) {
+    if (v === null || v === undefined || v === false) continue;
+    if (k === "text") el.textContent = v;
+    else if (k === "class") el.className = v;
+    else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+    else if (k === "html") el.innerHTML = v;
+    else el.setAttribute(k, v === true ? "" : v);
+  }
+  add(el, kids);
+  return el;
+}
+function add(el, kids) {
+  for (const kid of kids.flat(Infinity)) {
+    if (kid === null || kid === undefined || kid === false) continue;
+    el.appendChild(kid instanceof Node ? kid : document.createTextNode(String(kid)));
+  }
+}
+function clear(el) { while (el.firstChild) el.removeChild(el.firstChild); return el; }
+function put(el, ...kids) { clear(el); add(el, kids); return el; }
+
+const SVGNS = "http://www.w3.org/2000/svg";
+function svg(tag, attrs, ...kids) {
+  const el = document.createElementNS(SVGNS, tag);
+  for (const [k, v] of Object.entries(attrs || {})) el.setAttribute(k, v);
+  for (const kid of kids.flat()) if (kid) el.appendChild(kid);
+  return el;
+}
+const ICONS = {
+  home: "M4 11 12 4l8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z",
+  trophy: "M8 4h8v5a4 4 0 0 1-8 0zM8 6H5v1a3 3 0 0 0 3 3M16 6h3v1a3 3 0 0 1-3 3M12 13v4M9 20h6M10 17h4",
+  plus: "M12 5v14M5 12h14",
+  user: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM5 20a7 7 0 0 1 14 0",
+  arrow: "M5 12h14M13 6l6 6-6 6",
+  chev: "m9 6 6 6-6 6",
+  down: "m6 9 6 6 6-6",
+  check: "m5 12.5 4.5 4.5L19 7",
+  x: "M6 6l12 12M18 6 6 18",
+  clock: "M12 7v5l3 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z",
+  code: "m8 8-4 4 4 4M16 8l4 4-4 4M13.5 5l-3 14",
+  link: "M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1",
+  copy: "M9 9h10v10H9zM5 15V5h10",
+  sun: "M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4",
+  moon: "M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z",
+  scale: "M12 4v16M7 20h10M5 8h14M5 8l-3 6a3 3 0 0 0 6 0zM19 8l-3 6a3 3 0 0 0 6 0z",
+  flag: "M5 21V4h11l-2 4 2 4H5",
+  coin: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9 12h6M12 9v6",
+  back: "M9 14 4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3",
+  ext: "M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5",
+  list: "M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01",
+  users: "M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM3 20a6 6 0 0 1 12 0M16 4.5a3.5 3.5 0 0 1 0 6.5M18 14a6 6 0 0 1 3 6",
+  play: "M7 5v14l11-7z",
+};
+function icon(name, size) {
+  const s = svg("svg", { class: "ic", viewBox: "0 0 24 24", "aria-hidden": "true" }, svg("path", { d: ICONS[name] || ICONS.chev }));
+  if (size) { s.style.width = size + "px"; s.style.height = size + "px"; }
+  return s;
+}
+function markSvg() {
+  return svg("svg", { class: "mark", viewBox: "0 0 28 28", "aria-hidden": "true" },
+    svg("rect", { width: "28", height: "28", rx: "7", fill: "var(--accent)" }),
+    svg("path", { d: "M9.5 8.5 5.5 14l4 5.5M18.5 8.5l4 5.5-4 5.5", fill: "none", stroke: "var(--on-accent)", "stroke-width": "2.2", "stroke-linecap": "round", "stroke-linejoin": "round" }),
+    svg("path", { d: "m11.2 14.4 2.1 2.1 3.9-4.6", fill: "none", stroke: "var(--on-accent)", "stroke-width": "2.2", "stroke-linecap": "round", "stroke-linejoin": "round" }));
+}
+document.querySelectorAll(".markslot").forEach((el) => el.appendChild(markSvg()));
+
+function heroArt() {
+  const line = (x, y, w, o) => svg("rect", { x, y, width: w, height: "7", rx: "3.5", fill: "var(--ink-3)", opacity: o || ".35" });
+  const row = (y, w, cls) => [line(58, y, 90), svg("rect", { x: "58", y: y + 16, width: "210", height: "10", rx: "5", fill: "var(--line)" }),
+    svg("rect", { class: "bar " + cls, x: "58", y: y + 16, width: w, height: "10", rx: "5", fill: "var(--accent)" })];
+  return svg("svg", { viewBox: "0 0 380 300", role: "img", "aria-label": "A scorecard with four rubric bars filling up and a first-place ribbon" },
+    svg("rect", { x: "70", y: "34", width: "260", height: "246", rx: "14", fill: "var(--surface-2)", stroke: "var(--line)" }),
+    svg("rect", { x: "34", y: "18", width: "262", height: "250", rx: "14", fill: "var(--surface)", stroke: "var(--line-2)", "stroke-width": "1.5" }),
+    svg("path", { d: "M58 52h28l6-10M58 52l6 10", fill: "none", stroke: "var(--accent)", "stroke-width": "3", "stroke-linecap": "round", "stroke-linejoin": "round" }),
+    line(100, 44, 110, ".55"), line(100, 58, 70),
+    row(88, 168, "b1"), row(130, 120, "b2"), row(172, 188, "b3"), row(214, 96, "b4"),
+    svg("g", { class: "ribbon" },
+      svg("path", { d: "M286 92l-14 46 18-9 10 17 6-48zM314 92l14 46-18-9-10 17-6-48z", fill: "var(--accent)", opacity: ".75" }),
+      svg("circle", { cx: "300", cy: "70", r: "34", fill: "var(--accent)" }),
+      svg("circle", { cx: "300", cy: "70", r: "25", fill: "none", stroke: "var(--on-accent)", "stroke-width": "2", "stroke-dasharray": "3 4" }),
+      svg("path", { d: "m300 55 4.4 9 9.9 1.4-7.2 7 1.7 9.8-8.8-4.6-8.8 4.6 1.7-9.8-7.2-7 9.9-1.4z", fill: "var(--on-accent)" })));
+}
+function roleArt(kind) {
+  const st = { fill: "none", stroke: "currentColor", "stroke-width": "2", "stroke-linecap": "round", "stroke-linejoin": "round" };
+  if (kind === "sponsor") return svg("svg", { viewBox: "0 0 34 34", "aria-hidden": "true" },
+    svg("path", { d: "M11 6h12v7a6 6 0 0 1-12 0z", ...st }), svg("path", { d: "M17 19v5M12 28h10M14 24h6", ...st }),
+    svg("circle", { cx: "27", cy: "24", r: "4", fill: "currentColor", opacity: ".25" }), svg("path", { d: "M27 22v4", ...st }));
+  if (kind === "team") return svg("svg", { viewBox: "0 0 34 34", "aria-hidden": "true" },
+    svg("rect", { x: "5", y: "7", width: "24", height: "16", rx: "2.5", ...st }), svg("path", { d: "M3 27h28", ...st }),
+    svg("path", { d: "m13 12-3 3 3 3M21 12l3 3-3 3", ...st }));
+  return svg("svg", { viewBox: "0 0 34 34", "aria-hidden": "true" },
+    svg("rect", { x: "6", y: "5", width: "18", height: "24", rx: "2.5", ...st }), svg("path", { d: "M10 11h10M10 16h7M10 21h5", ...st }),
+    svg("circle", { cx: "24", cy: "22", r: "5", fill: "var(--surface)", ...st }), svg("path", { d: "m27.5 25.5 3 3", ...st }));
+}
+
+/* ---------- formatting ---------- */
+const nowSec = () => Math.floor(Date.now() / 1000);
+function genStr(w, dp = 2) {
+  let v; try { v = BigInt(w || 0); } catch (e) { return "0"; }
+  const neg = v < 0n; if (neg) v = -v;
+  const whole = v / WEI, frac = v % WEI;
+  let f = (frac * 10n ** BigInt(dp) / WEI).toString().padStart(dp, "0").replace(/0+$/, "");
+  return (neg ? "-" : "") + whole.toLocaleString("en-US") + (f ? "." + f : "");
+}
+const short = (a) => a ? a.slice(0, 6) + "…" + a.slice(-4) : "";
+const pts = (total) => (Number(total || 0) / 10).toFixed(1);
+function timeAgo(epoch) {
+  const d = nowSec() - Number(epoch || 0);
+  if (!epoch || d < 0) return "just now";
+  if (d < 60) return "just now";
+  if (d < 3600) return Math.floor(d / 60) + "m ago";
+  if (d < 86400) return Math.floor(d / 3600) + "h ago";
+  return Math.floor(d / 86400) + "d ago";
+}
+function dur(sec) {
+  sec = Math.max(0, Math.floor(sec));
+  const d = Math.floor(sec / 86400), hr = Math.floor((sec % 86400) / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+  if (d) return `${d}d ${hr}h`;
+  if (hr) return `${hr}h ${m}m`;
+  if (m) return `${m}m ${s}s`;
+  return `${s}s`;
+}
+function fmtTime(epoch) {
+  if (!epoch) return "not yet";
+  return new Date(Number(epoch) * 1000).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+}
+const minutesLabel = (m) => m < 60 ? `${m} min` : m < 1440 ? `${m / 60} h` : `${m / 1440} day${m === 1440 ? "" : "s"}`;
+function countdown(until, done) {
+  const el = h("span", { class: "num", "data-until": String(until), "data-done": done || "now" });
+  tick(el); return el;
+}
+function tick(el) {
+  const left = Number(el.dataset.until) - nowSec();
+  el.textContent = left > 0 ? dur(left) : el.dataset.done;
+}
+setInterval(() => document.querySelectorAll("[data-until]").forEach(tick), 1000);
+
+function toast(text, bad) {
+  const t = h("div", { class: "toast" + (bad ? " bad" : ""), text });
+  $("toasts").appendChild(t);
+  setTimeout(() => t.remove(), 4200);
+}
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); toast("Copied"); } catch (e) { toast("Copy failed; select the text instead", true); }
+}
+
+/* ---------- contract address ---------- */
+const okAddr = (v) => /^0x[0-9a-fA-F]{40}$/.test(String(v || ""));
+function resolveContract() {
+  try {
+    const q = new URLSearchParams(location.search).get("contract");
+    if (okAddr(q)) { try { localStorage.setItem("hackjudge.contract", q); } catch (e) {} return q; }
+  } catch (e) {}
+  try { const s = localStorage.getItem("hackjudge.contract"); if (okAddr(s) && s !== ZERO) return s; } catch (e) {}
+  return DEFAULT_CONTRACT_ADDRESS;
+}
+const CONTRACT_ADDRESS = resolveContract();
+const hasContract = CONTRACT_ADDRESS.toLowerCase() !== ZERO;
+$("footAddr").textContent = hasContract ? CONTRACT_ADDRESS : "not set";
+$("sideFoot").textContent = hasContract ? "Contract " + short(CONTRACT_ADDRESS) : "No contract set";
+
+/* ---------- wallet and network ---------- */
+const readClient = createClient({ chain: studionet });
+let client = null, account = null, usingInjected = false, walletKind = "";
+const net = { ok: true };
+const RPC_URL = studionet.rpcUrls?.default?.http?.[0];
+const hexChainId = () => "0x" + Number(studionet.id).toString(16);
+async function checkChain() {
+  if (!usingInjected || !window.ethereum) { net.ok = true; drawNet(); return true; }
+  try { net.ok = String(await window.ethereum.request({ method: "eth_chainId" })).toLowerCase() === hexChainId().toLowerCase(); }
+  catch (e) { net.ok = true; }
+  drawNet(); return net.ok;
+}
+async function switchChain() {
+  try { await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: hexChainId() }] }); }
+  catch (e) {
+    if (e?.code === 4001) throw e;
+    await window.ethereum.request({ method: "wallet_addEthereumChain", params: [{ chainId: hexChainId(), chainName: studionet.name || "GenLayer Studio",
+      nativeCurrency: studionet.nativeCurrency || { name: "GEN", symbol: "GEN", decimals: 18 }, rpcUrls: studionet.rpcUrls?.default?.http || [] }] });
+  }
+  return checkChain();
+}
+function drawNet() { $("netBanner").hidden = net.ok || !account; drawWallet(); }
+$("switchNet").addEventListener("click", async () => { try { if (await switchChain()) toast("Switched to GenLayer Studio"); } catch (e) { toast(explain(e), true); } });
+if (window.ethereum?.on) {
+  window.ethereum.on("chainChanged", () => checkChain());
+  window.ethereum.on("accountsChanged", (accs) => {
+    if (!usingInjected) return;
+    if (!accs || !accs.length) return disconnect();
+    account = accs[0]; client = createClient({ chain: studionet, account }); toast("Wallet account changed"); route();
+  });
+}
+function drawWallet() {
+  const btn = $("walletBtn");
+  btn.classList.toggle("on", !!account && net.ok);
+  btn.classList.toggle("warn", !!account && !net.ok);
+  const narrow = matchMedia("(max-width: 419px)").matches;
+  $("walletLbl").textContent = account ? (narrow ? account.slice(0, 4) + "…" + account.slice(-4) : short(account)) : narrow ? "Connect" : "Connect wallet";
+  btn.setAttribute("aria-label", account ? "Wallet " + account + ", open wallet menu" : "Connect wallet");
+}
+async function balanceOf(addr) {
+  if (!RPC_URL || !addr) return null;
+  try {
+    const res = await fetch(RPC_URL, { method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "eth_getBalance", params: [addr, "latest"] }) });
+    const body = await res.json();
+    return typeof body?.result === "string" ? BigInt(body.result) : null;
+  } catch (e) { return null; }
+}
+const KEY_SLOT = "hackjudge.testsession";
+const readTestKey = () => { try { const v = sessionStorage.getItem(KEY_SLOT); return /^0x[0-9a-f]{64}$/.test(v || "") ? v : ""; } catch (e) { return ""; } };
+const writeTestKey = (v) => { try { if (v) sessionStorage.setItem(KEY_SLOT, v); else sessionStorage.removeItem(KEY_SLOT); } catch (e) {} };
+function randomKey() { const b = new Uint8Array(32); crypto.getRandomValues(b); return "0x" + Array.from(b, (x) => x.toString(16).padStart(2, "0")).join(""); }
+function useLocalAccount(pk, kind) {
+  const acct = createAccount(pk);
+  account = acct.address; usingInjected = false; walletKind = kind;
+  client = createClient({ chain: studionet, account: acct });
+  net.ok = true; drawNet();
+}
+function startTestSession(silent) {
+  let pk = readTestKey();
+  if (!pk) { pk = randomKey(); writeTestKey(pk); }
+  useLocalAccount(pk, "test");
+  if (!silent) { closeDialog(); toast("Test session started. Add test GEN in the wallet menu before sending value."); route(); }
+}
+async function connectInjected(errEl) {
+  if (!window.ethereum) { errEl.textContent = "No browser wallet found. Open this page in your wallet app's browser, or start a test session."; return; }
+  try {
+    const accs = await window.ethereum.request({ method: "eth_requestAccounts" });
+    account = accs[0]; usingInjected = true; walletKind = "injected";
+    client = createClient({ chain: studionet, account });
+    writeTestKey("");
+    if (!(await checkChain())) { try { await switchChain(); } catch (e) {} }
+    closeDialog(); toast("Wallet connected"); route();
+  } catch (e) { errEl.textContent = explain(e); }
+}
+function connectKey(input, errEl) {
+  let pk = input.value.trim();
+  if (/^[0-9a-fA-F]{64}$/.test(pk)) pk = "0x" + pk;
+  if (!/^0x[0-9a-fA-F]{64}$/.test(pk)) { input.setAttribute("aria-invalid", "true"); errEl.textContent = "A private key is 64 hexadecimal characters, optionally starting with 0x."; input.focus(); return; }
+  try { useLocalAccount(pk, "key"); writeTestKey(""); closeDialog(); toast("Account connected"); route(); }
+  catch (e) { errEl.textContent = "This key could not be used: " + explain(e); }
+}
+function disconnect() { writeTestKey(""); client = null; account = null; usingInjected = false; walletKind = ""; net.ok = true; drawNet(); closeDialog(); toast("Disconnected"); route(); }
+
+/* ---------- dialogs ---------- */
+const dlg = $("dlg");
+let dlgResolve = null, dlgReturn = null;
+function openDialog(title, ...content) {
+  if (!dlg.open) dlgReturn = document.activeElement;
+  put($("dlgBody"), h("div", { class: "dlg-head" }, h("h2", { id: "dlgTitle", text: title }),
+    h("button", { class: "x", type: "button", "aria-label": "Close", onclick: () => closeDialog(false) }, icon("x"))), ...content);
+  if (!dlg.open) dlg.showModal();
+}
+function settle(v) { if (dlgResolve) { const r = dlgResolve; dlgResolve = null; r(v); } }
+function closeDialog(v) { settle(v); if (dlg.open) dlg.close(); }
+dlg.addEventListener("close", () => { settle(false); if (dlgReturn && document.contains(dlgReturn)) dlgReturn.focus(); dlgReturn = null; });
+dlg.addEventListener("click", (e) => { if (e.target === dlg) closeDialog(false); });
+function confirmAction({ title, intro, rows = [], note, confirm, danger }) {
+  return new Promise((resolve) => {
+    openDialog(title,
+      intro ? h("p", { class: "muted", text: intro }) : null,
+      rows.length ? h("dl", { class: "dl", style: "margin-top:16px" }, rows.map(([k, v]) => [h("dt", { text: k }), h("dd", { text: v })])) : null,
+      note ? h("p", { class: "callout small", style: "margin-top:16px", text: note }) : null,
+      h("div", { class: "actions", style: "margin-top:22px" },
+        h("button", { class: "btn btn-secondary", type: "button", text: "Go back", onclick: () => closeDialog(false) }),
+        h("button", { class: "btn " + (danger ? "btn-danger" : "btn-primary"), type: "button", id: "dlgOk", text: confirm, onclick: () => closeDialog(true) })));
+    dlgResolve = (v) => resolve(!!v);
+    setTimeout(() => $("dlgOk")?.focus(), 30);
+  });
+}
+function pickFrom(title, options, current) {
+  return new Promise((resolve) => {
+    openDialog(title, h("div", { class: "chips", role: "group", "aria-label": title },
+      options.map(([value, label]) => h("button", { class: "pick", type: "button", "aria-pressed": String(value === current), text: label, onclick: () => closeDialog({ value }) }))));
+    dlgResolve = (v) => resolve(v && typeof v === "object" ? v.value : null);
+  });
+}
+function fundBlock() {
+  const out = h("p", { class: "small muted", role: "status", style: "margin-top:8px" });
+  return h("div", { class: "inset", style: "margin-top:14px" },
+    h("h3", { text: "Test GEN" }),
+    h("p", { class: "small muted", style: "margin:4px 0 10px", text: "GenLayer Studio can credit test GEN to the connected account." }),
+    h("button", { class: "btn btn-secondary sm block", type: "button", text: "Request 100 test GEN", onclick: (ev) => runButton(ev.currentTarget, async () => {
+      if (!RPC_URL) { out.textContent = "No Studio RPC address is configured."; return; }
+      try {
+        out.textContent = "Requesting…";
+        const res = await fetch(RPC_URL, { method: "POST", headers: { "content-type": "application/json" },
+          body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "sim_fundAccount", params: [account, Number(100n * WEI)] }) });
+        const body = await res.json();
+        if (body.error) { out.textContent = "Studio refused the request: " + (body.error.message || "unknown error"); return; }
+        for (let i = 0; i < 6; i++) { await new Promise((r) => setTimeout(r, 1500)); const b = await balanceOf(account); if (b !== null) { out.textContent = `Balance is now ${genStr(b)} GEN.`; if (b > 0n) return; } }
+      } catch (e) { out.textContent = explain(e); }
+    }) }), out);
+}
+async function openWallet() {
+  const err = h("p", { class: "err", role: "alert" });
+  const pk = h("input", { class: "input", id: "pkIn", type: "password", placeholder: "0x followed by 64 characters", autocapitalize: "off", autocomplete: "off", spellcheck: "false" });
+  const addrIn = h("input", { class: "input", id: "addrIn", value: hasContract ? CONTRACT_ADDRESS : "", placeholder: "0x followed by 40 characters", autocapitalize: "off", autocomplete: "off", spellcheck: "false" });
+  const addrErr = h("p", { class: "err", role: "alert" });
+  const bal = h("span", { class: "num", text: "…" });
+  openDialog(account ? "Wallet" : "Connect a wallet",
+    account ? h("div", { class: "inset stack" },
+      h("div", { class: "row between wrap" }, h("span", { class: "small muted", text: walletKind === "test" ? "Test session" : walletKind === "key" ? "Private key account" : "Browser wallet" }),
+        h("span", { class: "small" }, "Balance ", bal, " GEN")),
+      h("p", { class: "addr small", text: account }),
+      h("div", { class: "actions" },
+        h("button", { class: "btn btn-secondary sm", type: "button", onclick: () => copyText(account) }, icon("copy", 16), "Copy address"),
+        h("button", { class: "btn btn-danger sm", type: "button", text: "Disconnect", onclick: disconnect }))) : null,
+    account ? fundBlock() : null,
+    h("div", { style: account ? "margin-top:20px" : null },
+      h("h3", { text: account ? "Switch account" : "Choose how to sign" }),
+      h("div", { style: "margin-top:10px" },
+        h("button", { class: "option", type: "button", onclick: () => connectInjected(err) }, h("b", { text: "Browser wallet" }), h("span", { text: "MetaMask, Rabby or any injected wallet. On a phone, open this page in your wallet app's browser." })),
+        h("button", { class: "option", type: "button", onclick: () => startTestSession(false) }, h("b", { text: "Test session" }), h("span", { text: "A throwaway Studio account kept in this tab only." })))),
+    h("details", { class: "tune" }, h("summary", { text: "Use a Studio private key" }),
+      h("div", { class: "tune-body" },
+        h("div", { class: "field" }, h("label", { for: "pkIn", text: "Private key" }), pk, h("p", { class: "help", text: "Testnet keys only. The key stays in this tab and signs your transactions." })),
+        h("button", { class: "btn btn-secondary block", type: "button", style: "margin-top:10px", text: "Use this key", onclick: () => connectKey(pk, err) }))),
+    err,
+    h("details", { class: "tune", open: !hasContract }, h("summary", { text: "Contract address" }),
+      h("div", { class: "tune-body" },
+        h("div", { class: "field" }, h("label", { for: "addrIn", text: "HackJudge contract" }), addrIn,
+          h("p", { class: "help", text: "A deployed HackJudge contract on GenLayer Studio. This browser remembers it." }), addrErr),
+        h("button", { class: "btn btn-secondary block", type: "button", style: "margin-top:10px", text: "Use this contract", onclick: () => {
+          const v = addrIn.value.trim();
+          if (!okAddr(v)) { addrIn.setAttribute("aria-invalid", "true"); addrErr.textContent = "Enter a 0x address with 40 hexadecimal characters."; addrIn.focus(); return; }
+          try { localStorage.setItem("hackjudge.contract", v); } catch (e) {}
+          location.search = "?contract=" + v;
+        } }))));
+  if (account) { const b = await balanceOf(account); bal.textContent = b === null ? "unknown" : genStr(b); }
+}
+$("walletBtn").addEventListener("click", openWallet);
+function drawTheme() {
+  const dark = document.documentElement.dataset.theme === "dark";
+  put($("themeBtn"), icon(dark ? "sun" : "moon", 18));
+  $("themeBtn").setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
+  $("themeColor").setAttribute("content", dark ? "#0C0F14" : "#ECEFF3");
+}
+$("themeBtn").addEventListener("click", () => {
+  const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = next;
+  try { localStorage.setItem("hackjudge.theme", next); } catch (e) {}
+  drawTheme();
+});
+drawTheme();
+
+/* ---------- contract calls and transaction progress ---------- */
+function unwrap(receipt) {
+  let v = receipt?.consensus_data?.leader_receipt?.[0]?.result?.payload?.readable;
+  if (v === undefined) return null;
+  for (let i = 0; i < 3 && typeof v === "string"; i++) {
+    const t = v.trim();
+    if (!(t.startsWith("{") || t.startsWith("[") || t.startsWith('"'))) break;
+    try { v = JSON.parse(t); } catch (e) { break; }
+  }
+  return v;
+}
+const read = (functionName, args = []) => readClient.readContract({ address: CONTRACT_ADDRESS, functionName, args });
+async function readJson(functionName, args = []) { const raw = await read(functionName, args); return typeof raw === "string" ? JSON.parse(raw) : raw; }
+function explain(e) {
+  const m = String(e?.shortMessage || e?.details || e?.message || e || "");
+  if (e?.code === 4001 || /user rejected|user denied|rejected the request|denied transaction/i.test(m)) return "You declined the request in your wallet. Nothing was sent.";
+  if (/insufficient funds|insufficient balance/i.test(m)) return "This account does not have enough GEN for this transaction.";
+  if (/failed to fetch|networkerror|network error|timeout|timed out|load failed/i.test(m)) return "GenLayer Studio could not be reached. Check your connection and try again.";
+  const um = m.match(/UserError[^:]*:\s*(.+)/);
+  return (um ? um[1] : m).slice(0, 320) || "Unknown error";
+}
+function txPanel() {
+  const steps = [["sign", "Signature"], ["sent", "Submitted"], ["accepted", "Accepted"], ["final", "Finalized"]];
+  const items = steps.map(([k, t]) => h("li", { "data-k": k }, h("span", { class: "b", "aria-hidden": "true" }), h("span", { text: t })));
+  const msg = h("div", { class: "msg" });
+  const el = h("div", { class: "tx", role: "status", "aria-live": "polite", hidden: true }, h("ol", {}, items), msg);
+  return {
+    el,
+    reset() { el.hidden = true; el.classList.remove("bad"); items.forEach((li) => (li.className = "")); clear(msg); },
+    at(key, text) {
+      el.hidden = false; el.classList.remove("bad");
+      let reached = false;
+      for (const li of items) { if (li.dataset.k === key) { li.className = "now"; reached = true; } else li.className = reached ? "" : "done"; }
+      if (text !== undefined) put(msg, text);
+    },
+    accepted(text) { items.forEach((li) => (li.className = li.dataset.k === "final" ? "now" : "done")); if (text !== undefined) put(msg, text); },
+    final(text) { items.forEach((li) => (li.className = "done")); put(msg, text || "Finalized. This result is permanent."); },
+    fail(text, hint, extra) {
+      el.hidden = false; el.classList.add("bad");
+      (items.find((li) => li.className === "now") || items[0]).className = "fail";
+      put(msg, h("b", { text }), hint ? h("div", { style: "margin-top:4px", text: hint }) : null, extra || null);
+    },
+    note(text) { el.hidden = false; put(msg, text); },
+  };
+}
+function needClient() {
+  if (client) return true;
+  toast("Connect a wallet to continue", true); openWallet(); return false;
+}
+const busy = new Set();
+async function write(ui, label, functionName, args, valueWei) {
+  if (!needClient()) return null;
+  const key = functionName + JSON.stringify(args);
+  if (busy.has(key)) return null;
+  busy.add(key); ui.reset();
+  try {
+    if (usingInjected && !(await checkChain())) {
+      ui.at("sign", "Switching your wallet to GenLayer Studio…");
+      try { await switchChain(); }
+      catch (e) {
+        ui.fail("Your wallet is on the wrong network.", "This contract lives on GenLayer Studio.",
+          h("button", { class: "btn btn-secondary sm", type: "button", text: "Switch network", onclick: async () => { try { await switchChain(); toast("Switched to GenLayer Studio"); } catch (x) { toast(explain(x), true); } } }));
+        return null;
+      }
+    }
+    const value = valueWei ?? 0n;
+    if (value > 0n) {
+      const bal = await balanceOf(account);
+      if (bal !== null && bal < value) {
+        ui.at("sign");
+        ui.fail(`Not enough GEN: this needs ${genStr(value)} GEN and the account holds ${genStr(bal)} GEN.`, "Add GEN to this account, then try again. On Studio, use Request 100 test GEN in the wallet menu.");
+        return null;
+      }
+    }
+    ui.at("sign", usingInjected ? `Confirm ${label} in your wallet.` : `Signing ${label}…`);
+    const slow = setTimeout(() => ui.note("Still waiting for the wallet. Open your wallet app and look for a pending request."), 20000);
+    let hash;
+    try { hash = await client.writeContract({ address: CONTRACT_ADDRESS, functionName, args, value }); }
+    finally { clearTimeout(slow); }
+    ui.at("sent", h("span", {}, "Transaction ", h("span", { class: "addr", text: short(hash) }), " is with the validators. Calls that read web pages take a minute or two."));
+    const receipt = await client.waitForTransactionReceipt({ hash, status: "ACCEPTED", interval: 3000, retries: 200 });
+    const result = unwrap(receipt);
+    const lr = receipt?.consensus_data?.leader_receipt?.[0];
+    if (lr?.execution_result === "ERROR") {
+      ui.at("accepted");
+      ui.fail("The contract refused this call.", typeof result === "string" && result ? explain(result) : "No reason was returned.");
+      return null;
+    }
+    if (result && typeof result === "object" && result.rejected) {
+      ui.at("accepted");
+      ui.fail("Refused: " + result.rejected, `The ${genStr(result.refunded_wei)} GEN you sent was credited back to you. Withdraw it on the Mine tab.`);
+      return null;
+    }
+    ui.accepted("Accepted by validators. Waiting for finalization; the result already counts.");
+    client.waitForTransactionReceipt({ hash, status: "FINALIZED", interval: 5000, retries: 200 })
+      .then(() => ui.final()).catch(() => ui.note("Accepted. Finalization is taking longer than usual; the result stands unless it is appealed."));
+    return result === null ? true : result;
+  } catch (e) {
+    ui.fail(explain(e));
+    return null;
+  } finally { busy.delete(key); }
+}
+async function runButton(btn, fn) {
+  if (!btn || btn.disabled) return;
+  const label = btn.textContent;
+  btn.disabled = true; btn.setAttribute("aria-busy", "true");
+  put(btn, h("span", { class: "spin", "aria-hidden": "true" }), label);
+  try { return await fn(); }
+  finally { if (document.contains(btn)) { btn.disabled = false; btn.removeAttribute("aria-busy"); btn.textContent = label; } }
+}
+
+/* ---------- shared state and views ---------- */
+const state = { cfg: null, bootError: "" };
+async function boot() {
+  if (!hasContract) return;
+  try { state.cfg = await readJson("get_config"); state.bootError = ""; }
+  catch (e) { state.bootError = explain(e); }
+}
+function gate(root) {
+  if (!hasContract) {
+    put(root, h("div", { class: "panel stack measure" },
+      h("h1", { text: "Connect HackJudge to a contract" }),
+      h("p", { class: "muted", text: "This page reads and writes a deployed HackJudge contract on GenLayer Studio. Add its address to begin. Browsing needs nothing else; a wallet is only needed to host, enter or appeal." }),
+      h("button", { class: "btn btn-primary", type: "button", text: "Add contract address", onclick: openWallet })));
+    return true;
+  }
+  if (state.bootError) {
+    put(root, h("div", { class: "panel stack measure", role: "alert" },
+      h("h1", { text: "The contract could not be reached" }), h("p", { class: "muted", text: state.bootError }),
+      h("p", { class: "xs addr", text: "Contract " + CONTRACT_ADDRESS }),
+      h("div", { class: "actions" },
+        h("button", { class: "btn btn-primary", type: "button", text: "Try again", onclick: async () => { state.bootError = ""; await boot(); route(); } }),
+        h("button", { class: "btn btn-secondary", type: "button", text: "Change contract", onclick: openWallet }))));
+    return true;
+  }
+  return false;
+}
+const skel = (hgt = 64, n = 1) => Array.from({ length: n }, () => h("div", { class: "skel", style: `height:${hgt}px;margin-bottom:10px`, "aria-hidden": "true" }));
+function phaseOf(x, now = nowSec()) {
+  if (x.status === "OPEN") return now < Number(x.deadline) ? "open" : Number(x.entry_count) > 0 ? "toJudge" : "toClose";
+  if (x.status === "JUDGING") return "judging";
+  if (x.status === "APPEALS") return now < Number(x.appeal_ends) ? "appeals" : "toFinal";
+  return x.status === "FINALIZED" ? "final" : "cancelled";
+}
+const PHASE = {
+  open: ["Open for entries", "ok"], toJudge: ["Ready to judge", "warn"], toClose: ["Closed, no entries", "warn"], judging: ["Judging", "warn"],
+  appeals: ["Appeals open", "info"], toFinal: ["Ready to finalize", "info"], final: ["Finalized", "neutral"], cancelled: ["Cancelled", "bad"],
+};
+const chip = (text, tone) => h("span", { class: "chip " + (tone || ""), text });
+const phaseChip = (x) => { const [t, tone] = PHASE[phaseOf(x)]; return chip(t, tone); };
+const ENTRY = { PENDING: ["Waiting for judge", "warn"], SCORED: ["Scored", "ok"], UNREACHABLE: ["Unreachable", "bad"] };
+const entryChip = (s) => chip(...(ENTRY[s] || [s, ""]));
+function connectPrompt(text) {
+  return h("div", { class: "inset stack" }, h("p", { class: "muted small", text }),
+    h("button", { class: "btn btn-primary block", type: "button", text: "Connect wallet", onclick: openWallet }));
+}
+function hackCard(x) {
+  const ph = phaseOf(x);
+  const [, tone] = PHASE[ph];
+  const timing = ph === "open" ? ["clock", h("span", {}, "Closes in ", countdown(x.deadline, "now"))]
+    : ph === "appeals" ? ["scale", h("span", {}, "Appeals close in ", countdown(x.appeal_ends, "now"))]
+    : ph === "final" ? ["check", h("span", { text: "Finalized " + timeAgo(x.finalized_at) })]
+    : ["clock", h("span", { text: PHASE[ph][0] })];
+  return h("a", { class: "hcard " + tone, href: "#/h/" + x.id },
+    h("div", { class: "row between" }, phaseChip(x), h("span", { class: "xs", text: x.id })),
+    h("h3", { text: x.title }),
+    h("div", { class: "prize" }, genStr(x.prize_pool), h("small", { text: "GEN prize pool" })),
+    h("div", { class: "tags" }, x.criteria.map((c) => h("span", { class: "tag", text: c }))),
+    h("div", { class: "meta" }, h("span", {}, icon("users"), `${x.entry_count} ${x.entry_count === 1 ? "entry" : "entries"}`), h("span", {}, icon(timing[0]), timing[1])));
+}
+function hackGrid(items) { return h("div", { class: "grid" }, items.map(hackCard)); }
+
+/* ---------- home ---------- */
+const EVENTS = {
+  CREATED: ["trophy", "acc", (e) => `New hackathon with ${genStr(e.amount)} GEN in prizes`, (e) => e.detail],
+  ENTERED: ["code", "info", (e) => `${e.detail} entered`, (e) => `${genStr(e.amount)} GEN entry bond`],
+  JUDGING_STARTED: ["play", "warn", () => "Judging started", () => "Validators are reading the entries"],
+  JUDGED: ["check", "ok", (e) => `${e.entry} judged`, (e) => e.detail],
+  JUDGING_DONE: ["flag", "info", () => "All entries scored", () => "The appeal window is open"],
+  APPEAL_UPHELD: ["scale", "ok", (e) => `Appeal upheld on ${e.entry}`, (e) => `${e.detail}; bond refunded`],
+  APPEAL_REJECTED: ["scale", "warn", (e) => `Appeal rejected on ${e.entry}`, (e) => `${e.detail}; bond added to prizes`],
+  FINALIZED: ["coin", "acc", (e) => `${genStr(e.amount)} GEN paid to winners`, (e) => e.detail],
+  CANCELLED: ["back", "bad", () => "Hackathon cancelled", (e) => e.detail],
+};
+function feedItem(e) {
+  const [ic, tone, title, sub] = EVENTS[e.kind] || ["list", "", () => e.kind, () => e.detail];
+  const href = "#/h/" + e.hackathon + (e.entry && e.kind !== "FINALIZED" ? "/" + e.entry : "");
+  return h("li", {}, h("a", { href },
+    h("span", { class: "ev-i " + tone, "aria-hidden": "true" }, icon(ic, 17)),
+    h("span", { style: "min-width:0" }, h("span", { class: "ev-t", text: title(e) }), h("span", { class: "ev-s", text: `${e.hackathon}${e.entry ? "/" + e.entry : ""}, ${sub(e)}` })),
+    h("span", { class: "ev-a", text: timeAgo(e.at) })));
+}
+const RUBRICS = {
+  balanced: { label: "innovation, execution and docs", rubric: [
+    { name: "Innovation", weight: 35, detail: "A new idea, or a clearly new use of the technology" },
+    { name: "Execution", weight: 40, detail: "Working code and a demo that does what the README claims" },
+    { name: "Documentation", weight: 25, detail: "README explains the problem, setup steps and how to use it" }] },
+  product: { label: "user value and polish", rubric: [
+    { name: "User value", weight: 40, detail: "Solves a real problem for a named type of user" },
+    { name: "Usability", weight: 30, detail: "The demo is easy to understand and use" },
+    { name: "Completeness", weight: 30, detail: "Core flow works end to end without placeholders" }] },
+  technical: { label: "technical depth and tests", rubric: [
+    { name: "Technical depth", weight: 40, detail: "Non-trivial engineering, explained in the README" },
+    { name: "Correctness", weight: 30, detail: "Tests or evidence that the code works as described" },
+    { name: "Security", weight: 15, detail: "Considers misuse, limits and failure cases" },
+    { name: "Documentation", weight: 15, detail: "Setup and architecture are documented" }] },
+};
+const PRIZES = [[50, "50 GEN"], [100, "100 GEN"], [250, "250 GEN"], [500, "500 GEN"], [1000, "1,000 GEN"]];
+const WINDOWS = [[10, "10 minutes"], [60, "1 hour"], [1440, "1 day"], [10080, "7 days"], [43200, "30 days"]];
+const APPEALS = [[5, "5 minutes"], [30, "30 minutes"], [1440, "1 day"], [4320, "3 days"]];
+const draft = { prize: 100, window: 10080, rubric: "balanced", appeal: 1440 };
+
+async function viewHome(root) {
+  if (gate(root)) return;
+  const live = h("span", { class: "live" }, h("i", { "aria-hidden": "true" }), h("span", { text: "Reading the contract…" }));
+  const stats = h("dl", { class: "stats", "aria-busy": "true" }, Array.from({ length: 4 }, () => h("div", {}, h("div", { class: "skel", style: "height:46px" }))));
+  const feedList = h("ol", {}, skel(46, 4).map((s) => h("li", {}, s)));
+  const feedFoot = h("div", { class: "feed-foot" });
+  const latest = h("div", {}, skel(150, 1));
+  const sentence = h("p", { class: "sentence" });
+  const drawSentence = () => {
+    const tok = (label, onclick) => h("button", { class: "tok", type: "button", onclick }, label, icon("down"));
+    put(sentence, "Host a ", tok(`${draft.prize.toLocaleString("en-US")} GEN`, async () => { const v = await pickFrom("Prize pool", PRIZES, draft.prize); if (v !== null) { draft.prize = v; drawSentence(); } }),
+      " prize pool, open for ", tok(minutesLabel(draft.window), async () => { const v = await pickFrom("Submission window", WINDOWS, draft.window); if (v !== null) { draft.window = v; drawSentence(); } }),
+      ", judged on ", tok(RUBRICS[draft.rubric].label, async () => { const v = await pickFrom("Rubric", Object.entries(RUBRICS).map(([k, r]) => [k, r.label]), draft.rubric); if (v !== null) { draft.rubric = v; drawSentence(); } }),
+      ", with ", tok(minutesLabel(draft.appeal), async () => { const v = await pickFrom("Appeal window", APPEALS, draft.appeal); if (v !== null) { draft.appeal = v; drawSentence(); } }),
+      " for appeals.");
+  };
+  drawSentence();
+  const role = (kind, title, desc, href) => h("a", { class: "role", href }, h("span", { class: "tile" }, roleArt(kind)),
+    h("span", {}, h("b", { text: title }), h("span", { class: "d", text: desc })), icon("chev"));
+  put(root,
+    h("section", { class: "hero", "aria-labelledby": "heroTitle" },
+      h("div", { class: "hero-grid" },
+        h("div", {}, live,
+          h("h1", { id: "heroTitle", text: "Hackathon prizes, judged in the open." }),
+          h("p", { class: "lede", text: "Sponsors lock a prize pool and publish a weighted rubric. After the deadline, validators read every README and demo, score each criterion from 0 to 10, and pay the top three 50, 30 and 20 percent." }),
+          h("div", { class: "actions" }, h("a", { class: "btn btn-primary", href: "#/host", text: "Host a hackathon" }), h("a", { class: "btn btn-secondary", href: "#/hackathons", text: "Browse hackathons" }))),
+        h("div", { class: "hero-art" }, heroArt())),
+      stats),
+    h("section", { class: "section", "aria-labelledby": "feedTitle" },
+      h("div", { class: "sechead" }, h("h2", { id: "feedTitle", text: "Live contract activity" }), h("span", { class: "xs", text: "Read from the contract" })),
+      h("div", { class: "panel feed" }, feedList, feedFoot)),
+    h("section", { class: "section", "aria-labelledby": "rolesTitle" },
+      h("div", { class: "sechead" }, h("h2", { id: "rolesTitle", text: "Start where you are" })),
+      h("div", { class: "roles" },
+        role("sponsor", "Sponsor a prize", "Lock GEN, publish the rubric and let validators judge.", "#/host"),
+        role("team", "Enter with your repo", "Submit a GitHub repo and a demo link with a small bond.", "#/hackathons?f=open"),
+        role("judge", "Check the scores", "Run the judge, read every reason and follow appeals.", "#/hackathons?f=review"))),
+    h("section", { class: "section", "aria-labelledby": "composeTitle" },
+      h("div", { class: "sechead" }, h("h2", { id: "composeTitle", text: "Set up a hackathon in one sentence" })),
+      h("div", { class: "panel" }, h("p", { class: "xs", style: "margin-bottom:6px", text: "Tap a highlighted part to change it." }), sentence,
+        h("div", { class: "actions", style: "margin-top:16px" },
+          h("a", { class: "btn btn-primary", href: "#/host", onclick: (ev) => { ev.preventDefault(); location.hash = `#/host?prize=${draft.prize}&window=${draft.window}&rubric=${draft.rubric}&appeal=${draft.appeal}`; } }, "Continue to details", icon("arrow", 18))))),
+    h("section", { class: "section" },
+      h("details", { class: "how", open: true },
+        h("summary", {}, h("h2", { text: "How judging works" }), icon("down")),
+        h("ol", { class: "steps" },
+          [["Post the prize", "The sponsor locks GEN and a rubric of up to five weighted criteria. Teams see it before they enter."],
+           ["Submit a repo", "Teams post a GitHub repo, an optional commit SHA and a demo link, with a small entry bond."],
+           ["Validators judge", "After the deadline anyone runs the judge. Each validator reads the README and demo and must agree on the scores within 2 points."],
+           ["Appeal, then pay", "A team can appeal once with a bond. A change of 10 points or more replaces the score and refunds the bond. Then finalize pays 50, 30 and 20 percent."]]
+            .map(([t, d], i) => h("li", {}, h("span", { class: "n", text: String(i + 1) }), h("h3", { text: t }), h("p", { text: d })))))),
+    h("section", { class: "section", "aria-labelledby": "latestTitle" },
+      h("div", { class: "sechead" }, h("h2", { id: "latestTitle", text: "Latest hackathons" }), h("a", { class: "btn btn-quiet sm", href: "#/hackathons", text: "See all" })),
+      latest));
+
+  let st, acct, act, list;
+  try { [st, acct, act, list] = await Promise.all([readJson("get_stats"), readJson("get_accounting"), readJson("get_activity", [0, 8]), readJson("list_hackathons", [0, 3])]); }
+  catch (e) {
+    put(live, h("span", { text: "The contract could not be read right now." }));
+    put(stats, h("div", { style: "grid-column:1/-1" }, h("p", { class: "muted small", text: explain(e) }), h("button", { class: "btn btn-secondary sm", type: "button", style: "margin-top:8px", text: "Try again", onclick: () => viewHome(root) })));
+    put(feedList, h("li", {}, h("p", { class: "muted small", style: "padding:12px 0", text: "Activity appears once the contract can be read." })));
+    put(latest, h("p", { class: "muted small", text: explain(e) }));
+    return;
+  }
+  put(live, h("i", { "aria-hidden": "true" }), h("span", {}, h("b", { text: String(st.open) }), st.open === 1 ? " hackathon open for entries" : " hackathons open for entries"));
+  stats.removeAttribute("aria-busy");
+  put(stats,
+    h("div", {}, h("dt", { text: "Live prize pools" }), h("dd", {}, genStr(st.live_prize_pool), h("small", { text: "GEN" })), h("span", { class: "sub acc", text: `${st.open + st.judging + st.appeals} active` })),
+    h("div", {}, h("dt", { text: "Hackathons" }), h("dd", { text: String(st.hackathons) }), h("span", { class: "sub info", text: `${st.finalized} finalized` })),
+    h("div", {}, h("dt", { text: "Entries judged" }), h("dd", { text: String(st.scored + st.unreachable) }), h("span", { class: "sub warn", text: `${st.appeals_filed} appeal${st.appeals_filed === 1 ? "" : "s"} filed` })),
+    h("div", {}, h("dt", { text: "Paid to winners" }), h("dd", {}, genStr(st.prizes_paid), h("small", { text: "GEN" })), h("span", { class: "sub ok", text: `${genStr(st.returned_to_sponsors)} GEN back to sponsors` })));
+  if (!act.items.length) put(feedList, h("li", {}, h("div", { class: "empty" }, h("h3", { text: "No activity yet" }), h("p", { class: "small", text: "Hosting the first hackathon starts the feed." }), h("a", { class: "btn btn-primary", href: "#/host", text: "Host a hackathon" }))));
+  else put(feedList, act.items.map(feedItem));
+  const balanced = !!acct.balanced;
+  put(feedFoot,
+    h("div", {}, h("b", { text: genStr(acct.held_in_hackathons) + " GEN" }), h("span", { text: "held for prizes and bonds" })),
+    h("div", {}, h("b", { text: genStr(acct.owed_total) + " GEN" }), h("span", { text: "refunds waiting to be withdrawn" })),
+    h("div", {}, h("b", { text: genStr(acct.contract_balance) + " GEN" }), h("span", { text: "contract balance" })),
+    h("div", { class: "bal" + (balanced ? "" : " off") }, h("b", {}, icon(balanced ? "check" : "x", 18), balanced ? "Balanced" : "Out of balance"),
+      h("span", { class: "xs", text: balanced ? "Balance equals held plus owed" : "Balance does not match liabilities" })));
+  if (!list.items.length) put(latest, h("div", { class: "panel empty" }, h("h3", { text: "No hackathons yet" }), h("p", { text: "The first hackathon hosted on this contract appears here." }), h("a", { class: "btn btn-primary", href: "#/host", text: "Host the first one" })));
+  else put(latest, hackGrid(list.items));
+}
+
+/* ---------- hackathons list ---------- */
+const FILTERS = [["all", "All"], ["open", "Open"], ["review", "Judging and appeals"], ["final", "Finalized"]];
+async function viewList(root, params) {
+  if (gate(root)) return;
+  let filter = FILTERS.some((f) => f[0] === params.get("f")) ? params.get("f") : "all";
+  const body = h("div", {}, skel(150, 2));
+  const bar = h("div", { class: "filters", role: "group", "aria-label": "Filter hackathons" });
+  put(root, h("div", { class: "pagehead" }, h("div", {}, h("h1", { text: "Hackathons" }), h("p", { text: "Every prize pool on this contract, newest first." })),
+    h("a", { class: "btn btn-primary", href: "#/host" }, icon("plus", 18), "Host a hackathon")), bar, body);
+  let items = [];
+  const match = (x) => { const p = phaseOf(x); return filter === "all" || (filter === "open" && p === "open") || (filter === "review" && ["toJudge", "judging", "appeals", "toFinal"].includes(p)) || (filter === "final" && ["final", "cancelled"].includes(p)); };
+  const draw = () => {
+    put(bar, FILTERS.map(([k, t]) => h("button", { class: "pick", type: "button", "aria-pressed": String(k === filter), text: t, onclick: () => { filter = k; draw(); } })));
+    const shown = items.filter(match);
+    put(body, shown.length ? hackGrid(shown) : h("div", { class: "panel empty" }, h("h3", { text: items.length ? "Nothing in this filter" : "No hackathons yet" }),
+      h("p", { text: items.length ? "Try another filter." : "Host the first one to get started." }), items.length ? null : h("a", { class: "btn btn-primary", href: "#/host", text: "Host a hackathon" })));
+  };
+  try {
+    let offset = 0, total = 1;
+    while (offset < total && offset < 200) { const page = await readJson("list_hackathons", [offset, 50]); total = page.total; items = items.concat(page.items); offset += 50; }
+  } catch (e) { put(body, h("p", { class: "err", text: explain(e) })); return; }
+  draw();
+}
+
+/* ---------- host ---------- */
+async function viewHost(root, params) {
+  if (gate(root)) return;
+  const cfg = state.cfg;
+  const p = { prize: Number(params.get("prize")) || draft.prize, window: Number(params.get("window")) || draft.window,
+    appeal: Number(params.get("appeal")) || draft.appeal, entryBond: 2, appealBond: 5 };
+  let rubric = JSON.parse(JSON.stringify((RUBRICS[params.get("rubric")] || RUBRICS[draft.rubric]).rubric));
+  const title = h("input", { class: "input", id: "fTitle", maxlength: String(cfg.max_title), placeholder: "For example: GenLayer Builders Cup", autocomplete: "off" });
+  const brief = h("textarea", { class: "input", id: "fBrief", maxlength: String(cfg.max_brief), placeholder: "What should teams build? Validators read this too." });
+  const prize = h("input", { class: "input", id: "fPrize", inputmode: "numeric", value: String(p.prize), autocomplete: "off" });
+  const crits = h("div", {});
+  const wsum = h("div", { class: "wsum" });
+  const err = h("p", { class: "err", role: "alert" });
+  const preview = h("div", { class: "split" });
+  const tx = txPanel();
+  const groups = {};
+  const chipGroup = (key, label, options, fmt) => {
+    const box = h("div", { class: "chips", role: "group", "aria-label": label });
+    const draw = () => put(box, options.map((v) => h("button", { class: "pick", type: "button", "aria-pressed": String(p[key] === v), text: fmt(v), onclick: () => { p[key] = v; draw(); drawPreview(); } })));
+    draw(); groups[key] = draw;
+    return h("div", { class: "field" }, h("span", { class: "lab", text: label }), box);
+  };
+  const prizeVal = () => { const t = prize.value.trim().replace(/,/g, ""); return /^\d{1,9}$/.test(t) ? Number(t) : NaN; };
+  function drawPreview() {
+    const v = prizeVal();
+    const ok = Number.isFinite(v) && v >= cfg.min_prize_gen;
+    const pool = ok ? BigInt(v) * WEI : 0n;
+    const a = pool * 50n / 100n, b = pool * 30n / 100n, c = pool - a - b;
+    put(preview, [["1st", a], ["2nd", b], ["3rd", c]].map(([k, w]) => h("div", {}, h("b", { text: ok ? genStr(w) + " GEN" : "–" }), h("span", { text: k }))));
+  }
+  function drawCrits() {
+    put(crits, rubric.map((c, i) => {
+      const nm = h("input", { class: "input", value: c.name, maxlength: "40", "aria-label": `Criterion ${i + 1} name`, placeholder: "Name", oninput: (e) => { c.name = e.target.value; } });
+      const wt = h("input", { class: "input", value: String(c.weight), inputmode: "numeric", "aria-label": `Criterion ${i + 1} weight in percent`, oninput: (e) => { c.weight = Number(e.target.value.replace(/\D/g, "")) || 0; drawSum(); } });
+      const dt = h("input", { class: "input detail", value: c.detail, maxlength: "160", "aria-label": `Criterion ${i + 1} description`, placeholder: "What a high score looks like", oninput: (e) => { c.detail = e.target.value; } });
+      return h("div", { class: "crit" }, nm, wt,
+        h("button", { class: "iconbtn", type: "button", "aria-label": `Remove criterion ${i + 1}`, disabled: rubric.length === 1 ? true : null, onclick: () => { rubric.splice(i, 1); drawCrits(); } }, icon("x", 18)), dt);
+    }), rubric.length < cfg.max_criteria ? h("button", { class: "btn btn-secondary sm", type: "button", style: "margin-top:10px", onclick: () => { rubric.push({ name: "", weight: 0, detail: "" }); drawCrits(); } }, icon("plus", 16), "Add criterion") : null);
+    drawSum();
+  }
+  function drawSum() {
+    const sum = rubric.reduce((s, c) => s + (Number(c.weight) || 0), 0);
+    put(wsum, h("span", { class: "wbar", "aria-hidden": "true" }, rubric.map((c) => h("i", { style: `width:${Math.min(100, Number(c.weight) || 0)}%` }))),
+      h("b", { class: "num", style: sum === 100 ? "color:var(--ok)" : "color:var(--warn)", text: `${sum} / 100` }));
+  }
+  prize.addEventListener("input", drawPreview);
+  const tpl = h("div", { class: "chips", role: "group", "aria-label": "Start from a template" },
+    Object.entries(RUBRICS).map(([k, r]) => h("button", { class: "pick", type: "button", text: r.label.charAt(0).toUpperCase() + r.label.slice(1), onclick: () => { rubric = JSON.parse(JSON.stringify(r.rubric)); drawCrits(); } })));
+  const submit = h("button", { class: "btn btn-primary block", type: "button", text: "Lock prize and publish", onclick: (ev) => runButton(ev.currentTarget, async () => {
+    err.textContent = "";
+    const t = title.value.trim(), v = prizeVal();
+    const clean = rubric.map((c) => ({ name: c.name.trim(), weight: Number(c.weight) || 0, detail: c.detail.trim() }));
+    const sum = clean.reduce((s, c) => s + c.weight, 0);
+    if (t.length < 3) { err.textContent = "Give the hackathon a title of at least 3 characters."; title.focus(); return; }
+    if (!Number.isFinite(v) || v < cfg.min_prize_gen) { err.textContent = `The prize pool must be a whole number of at least ${cfg.min_prize_gen} GEN.`; prize.focus(); return; }
+    if (clean.some((c) => c.name.length < 2)) { err.textContent = "Every criterion needs a name of at least 2 characters."; return; }
+    if (new Set(clean.map((c) => c.name.toLowerCase())).size !== clean.length) { err.textContent = "Criterion names must be different."; return; }
+    if (clean.some((c) => c.weight < 1) || sum !== 100) { err.textContent = `Weights must be whole numbers that add up to 100. They add up to ${sum}.`; return; }
+    if (!needClient()) return;
+    const ok = await confirmAction({ title: "Lock the prize pool?", intro: "The GEN leaves your wallet now and stays in the contract until finalize pays the winners or returns it to you.",
+      rows: [["Prize pool", v.toLocaleString("en-US") + " GEN"], ["Open for", minutesLabel(p.window)], ["Appeal window", minutesLabel(p.appeal)], ["Entry bond", p.entryBond + " GEN"], ["Appeal bond", p.appealBond + " GEN"], ["Criteria", clean.map((c) => `${c.name} ${c.weight}%`).join(", ")]],
+      note: "You cannot change the rubric later. You can cancel only while no team has entered.", confirm: `Lock ${v.toLocaleString("en-US")} GEN` });
+    if (!ok) return;
+    const res = await write(tx, "the new hackathon", "create_hackathon", [t, brief.value.trim(), JSON.stringify(clean), p.window, p.appeal, p.entryBond, p.appealBond], BigInt(v) * WEI);
+    if (res && res.hackathon_id) { toast("Hackathon published"); setTimeout(() => { location.hash = "#/h/" + res.hackathon_id; }, 900); }
+  }) });
+  put(root,
+    h("div", { class: "pagehead" }, h("div", {}, h("h1", { text: "Host a hackathon" }), h("p", { text: "Publish the rubric validators will score against and lock the prize. The top three get 50, 30 and 20 percent; unused shares come back to you." }))),
+    h("div", { class: "detail" },
+      h("div", { class: "stack" },
+        h("section", { class: "panel" }, h("h2", { text: "The brief" }),
+          h("div", { class: "field" }, h("label", { for: "fTitle", text: "Title" }), title),
+          h("div", { class: "field" }, h("label", { for: "fBrief", text: "Brief" }), brief, h("p", { class: "help", text: `Up to ${cfg.max_brief} characters. Validators see it when they judge.` }))),
+        h("section", { class: "panel" }, h("h2", { text: "Rubric" }),
+          h("p", { class: "small muted", text: `Up to ${cfg.max_criteria} criteria. Each is scored 0 to 10; weights add up to 100.` }),
+          h("div", { style: "margin-top:12px" }, tpl), h("div", { style: "margin-top:14px" }, crits), wsum),
+        h("section", { class: "panel" }, h("h2", { text: "Timing and bonds" }),
+          chipGroup("window", "Open for entries", [10, 60, 1440, 10080, 43200], minutesLabel),
+          chipGroup("appeal", "Appeal window after judging", [5, 30, 1440, 4320], minutesLabel),
+          chipGroup("entryBond", "Entry bond per team", [1, 2, 5, 10], (v) => v + " GEN"),
+          chipGroup("appealBond", "Appeal bond", [2, 5, 10, 25], (v) => v + " GEN"),
+          h("p", { class: "help", text: "Entry bonds come back at finalize unless neither the README nor the demo could be read. Rejected appeal bonds join the prize pool." }))),
+      h("aside", { class: "side" }, h("section", { class: "panel" }, h("h2", { text: "Prize pool" }),
+        h("div", { class: "field" }, h("label", { for: "fPrize", text: "GEN to lock" }), prize, h("p", { class: "help", text: `Whole GEN, at least ${cfg.min_prize_gen}.` })),
+        h("div", { class: "chips", style: "margin-top:10px" }, PRIZES.map(([v, l]) => h("button", { class: "pick", type: "button", text: l, onclick: () => { prize.value = String(v); drawPreview(); } }))),
+        preview, h("div", { style: "margin-top:16px" }, submit), err, tx.el))));
+  drawCrits(); drawPreview();
+}
+
+/* ---------- hackathon detail ---------- */
+function scoreBars(e) {
+  return h("div", {}, e.criteria.map((name, i) => h("div", { class: "score" },
+    h("span", { class: "nm", text: `${name} (${e.weights[i]}%)` }), h("span", { class: "v", text: e.scores.length ? `${e.scores[i]}/10` : "–" }),
+    h("div", { class: "meter" }, h("i", { style: `width:${e.scores.length ? e.scores[i] * 10 : 0}%` })),
+    e.reasons[i] ? h("p", { class: "why", text: e.reasons[i] }) : null)));
+}
+function leaderboard(x, board) {
+  if (!board.rows.length) return h("div", { class: "empty" }, h("h3", { text: "No entries yet" }), h("p", { class: "small", text: phaseOf(x) === "open" ? "Entries appear here as teams submit." : "Nobody entered this hackathon." }));
+  const prizeCell = (r) => BigInt(r.prize || 0) > 0n ? genStr(r.prize) + " GEN" : "–";
+  const totalCell = (r) => r.status === "PENDING" ? "–" : pts(r.total);
+  const table = h("table", { class: "board only-wide" },
+    h("caption", { class: "sr", text: "Leaderboard" }),
+    h("thead", {}, h("tr", {}, h("th", { text: "Rank" }), h("th", { text: "Team" }), board.criteria.map((c, i) => h("th", { class: "r", text: `${c} ${board.weights[i]}%` })), h("th", { class: "r", text: "Total" }), h("th", { class: "r", text: board.final ? "Paid" : "Prize now" }))),
+    h("tbody", {}, board.rows.map((r) => h("tr", {},
+      h("td", {}, r.rank ? h("span", { class: "rank" + (r.rank <= 3 ? " top" : ""), text: String(r.rank) }) : entryChip(r.status)),
+      h("td", {}, h("a", { href: `#/h/${x.id}/${r.entry_id}`, text: r.team }), r.appealed ? h("span", { class: "xs", text: " appealed" }) : null),
+      board.criteria.map((_, i) => h("td", { class: "r num", text: r.scores.length ? String(r.scores[i]) : "–" })),
+      h("td", { class: "r num" }, h("b", { text: totalCell(r) })),
+      h("td", { class: "r num", text: prizeCell(r) })))));
+  const rows = h("ol", { class: "rows only-narrow" }, board.rows.map((r) => h("li", {}, h("a", { href: `#/h/${x.id}/${r.entry_id}` },
+    r.rank ? h("span", { class: "rank" + (r.rank <= 3 ? " top" : ""), text: String(r.rank) }) : h("span", { class: "rank", text: "–" }),
+    h("span", { style: "min-width:0" }, h("span", { class: "t", text: r.team }), h("span", { class: "s", text: r.status === "PENDING" ? "Waiting for judge" : r.status === "UNREACHABLE" ? "Unreachable" : r.scores.join(" / ") + (r.appealed ? ", appealed" : "") })),
+    h("span", { class: "e" }, h("b", { text: totalCell(r) }), h("span", { class: "xs", text: prizeCell(r) }))))));
+  return [table, rows];
+}
+function phaseTrack(x) {
+  const ph = phaseOf(x);
+  const order = { open: 0, toJudge: 1, toClose: 1, judging: 1, appeals: 2, toFinal: 3, final: 4, cancelled: 4 };
+  const at = order[ph];
+  const steps = [["Entries", "closes " + fmtTime(x.deadline)], ["Judging", x.judged_count + " of " + x.entry_count + " scored"],
+    ["Appeals", x.appeal_ends ? "until " + fmtTime(x.appeal_ends) : "after judging"], ["Payout", x.finalized_at ? fmtTime(x.finalized_at) : "after appeals"]];
+  return h("ol", { class: "phases", "aria-label": "Progress" }, steps.map(([t, s], i) => h("li", { class: i < at ? "done" : i === at ? "now" : "" }, t, h("small", { text: s }))));
+}
+async function viewHackathon(root, hid) {
+  if (gate(root)) return;
+  put(root, skel(160), skel(260));
+  let x, board, mine = null;
+  try { [x, board] = await Promise.all([readJson("get_hackathon", [hid]), readJson("get_leaderboard", [hid])]); }
+  catch (e) { put(root, h("div", { class: "panel stack", role: "alert" }, h("h1", { text: "Hackathon not found" }), h("p", { class: "muted", text: explain(e) }), h("a", { class: "btn btn-secondary", href: "#/hackathons", text: "All hackathons" }))); return; }
+  const me = account ? account.toLowerCase() : "";
+  if (me) mine = board.rows.find((r) => r.owner === me) || null;
+  const ph = phaseOf(x);
+  const tx = txPanel();
+  const refresh = () => setTimeout(() => viewHackathon(root, hid), 1200);
+  const err = h("p", { class: "err", role: "alert" });
+  const act = [];
+  if (ph === "open") {
+    if (me && me === x.sponsor) {
+      act.push(h("p", { class: "small muted", text: "You are the sponsor, so you cannot enter. Share this page with teams." }));
+      if (!x.entry_count) act.push(h("button", { class: "btn btn-danger block", type: "button", style: "margin-top:12px", text: "Cancel and get the prize back", onclick: (ev) => runButton(ev.currentTarget, async () => {
+        if (!(await confirmAction({ title: "Cancel this hackathon?", intro: "The prize pool returns to your wallet and the hackathon closes for good.", rows: [["Refund", genStr(x.prize_pool) + " GEN"]], confirm: "Cancel hackathon", danger: true }))) return;
+        if (await write(tx, "the cancellation", "cancel_hackathon", [x.id])) { toast("Hackathon cancelled"); refresh(); }
+      }) }));
+    } else if (mine) {
+      act.push(h("p", { class: "callout small", text: `Your entry ${mine.entry_id} (${mine.team}) is in. Judging starts after the deadline.` }));
+    } else {
+      const team = h("input", { class: "input", id: "eTeam", maxlength: "48", placeholder: "Team name", autocomplete: "off" });
+      const repo = h("input", { class: "input", id: "eRepo", placeholder: "https://github.com/owner/repo", autocapitalize: "off", autocomplete: "off", spellcheck: "false", inputmode: "url" });
+      const commit = h("input", { class: "input", id: "eCommit", placeholder: "Optional 40-character commit SHA", autocapitalize: "off", autocomplete: "off", spellcheck: "false" });
+      const demo = h("input", { class: "input", id: "eDemo", placeholder: "https://your-demo.example", autocapitalize: "off", autocomplete: "off", spellcheck: "false", inputmode: "url" });
+      act.push(h("div", { class: "field" }, h("label", { for: "eTeam", text: "Team name" }), team),
+        h("div", { class: "field" }, h("label", { for: "eRepo", text: "GitHub repository" }), repo),
+        h("div", { class: "field" }, h("label", { for: "eDemo", text: "Demo link" }), demo),
+        h("div", { class: "field" }, h("label", { for: "eCommit", text: "Commit to judge" }), commit, h("p", { class: "help", text: "Pin a commit so later edits cannot change what is judged. Empty means the default branch at judging time." })),
+        h("button", { class: "btn btn-primary block", type: "button", style: "margin-top:14px", text: `Enter with a ${genStr(x.entry_bond)} GEN bond`, onclick: (ev) => runButton(ev.currentTarget, async () => {
+          err.textContent = "";
+          const r = repo.value.trim().replace(/\/+$/, "").replace(/\.git$/, ""), d = demo.value.trim(), c = commit.value.trim().toLowerCase(), t = team.value.trim();
+          if (t.length < 2) { err.textContent = "The team name needs at least 2 characters."; team.focus(); return; }
+          if (!/^https:\/\/github\.com\/[A-Za-z0-9][A-Za-z0-9-]{0,38}\/[A-Za-z0-9._-]{1,100}$/.test(r)) { err.textContent = "Use a repository link like https://github.com/owner/repo."; repo.focus(); return; }
+          if (!/^https:\/\/[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+(:\d{2,5})?(\/\S*)?$/.test(d) || d.length > 200) { err.textContent = "The demo link must be a public https:// address."; demo.focus(); return; }
+          if (c && !/^[0-9a-f]{40}$/.test(c)) { err.textContent = "The commit must be empty or the full 40-character SHA."; commit.focus(); return; }
+          if (!needClient()) return;
+          if (!(await confirmAction({ title: "Submit this entry?", intro: "Your bond comes back at finalize if validators can read your README or demo.",
+            rows: [["Team", t], ["Repository", r.replace("https://github.com/", "")], ["Commit", c ? c.slice(0, 10) + "…" : "default branch"], ["Entry bond", genStr(x.entry_bond) + " GEN"]], confirm: "Submit entry" }))) return;
+          const res = await write(tx, "your entry", "submit_entry", [x.id, t, r, d, c], BigInt(x.entry_bond));
+          if (res && res.entry_id) { toast(`Entry ${res.entry_id} submitted`); refresh(); }
+        }) }));
+    }
+  } else if (ph === "toJudge" || ph === "judging") {
+    const left = x.entry_count - x.judged_count;
+    act.push(h("p", { class: "small muted", text: `${left} of ${x.entry_count} entries still need scores. Each run scores up to ${state.cfg.judge_batch}, and anyone can run it.` }),
+      x.last_judge_note ? h("p", { class: "callout warn small", style: "margin-top:10px", text: x.last_judge_note }) : null,
+      h("button", { class: "btn btn-primary block", type: "button", style: "margin-top:14px", text: "Run the judge", onclick: (ev) => runButton(ev.currentTarget, async () => {
+        const res = await write(tx, "the judge run", "judge", [x.id]);
+        if (res) { toast(res.remaining === 0 ? "All entries scored. Appeals are open." : res.note || `${res.judged?.length || 0} scored, ${res.remaining} to go`, !!res.note); refresh(); }
+      }) }));
+  } else if (ph === "toClose") {
+    act.push(h("p", { class: "small muted", text: "Nobody entered, so finalize returns the full prize pool to the sponsor." }),
+      h("button", { class: "btn btn-primary block", type: "button", style: "margin-top:14px", text: "Finalize and return the prize", onclick: (ev) => runButton(ev.currentTarget, async () => {
+        if (!(await confirmAction({ title: "Finalize this hackathon?", rows: [["Back to sponsor", genStr(x.prize_pool) + " GEN"]], confirm: "Finalize" }))) return;
+        if (await write(tx, "finalize", "finalize", [x.id])) { toast("Finalized"); refresh(); }
+      }) }));
+  } else if (ph === "appeals") {
+    act.push(h("p", { class: "small muted" }, "Appeals close in ", countdown(x.appeal_ends, "a moment"), `. A team can appeal its own score once with a ${genStr(x.appeal_bond)} GEN bond.`));
+    if (mine && !mine.appealed) {
+      const note = h("textarea", { class: "input", id: "aNote", maxlength: "280", placeholder: "What did the first review miss? Point to the README section or demo feature." });
+      act.push(h("div", { class: "field", style: "margin-top:14px" }, h("label", { for: "aNote", text: `Appeal ${mine.team} (${pts(mine.total)} points)` }), note,
+        h("p", { class: "help", text: "Validators re-score from scratch. A change of 10 points or more, up or down, replaces your score and refunds the bond. Otherwise the bond joins the prize pool." })),
+        h("button", { class: "btn btn-primary block", type: "button", style: "margin-top:12px", text: `Appeal with ${genStr(x.appeal_bond)} GEN`, onclick: (ev) => runButton(ev.currentTarget, async () => {
+          if (!needClient()) return;
+          if (!(await confirmAction({ title: "File this appeal?", rows: [["Entry", `${mine.entry_id}, ${mine.team}`], ["Current score", pts(mine.total) + " / 100"], ["Appeal bond", genStr(x.appeal_bond) + " GEN"]],
+            note: "The new score can also be lower. A change under 10 points keeps the original score and the bond goes to the prize pool.", confirm: "File appeal" }))) return;
+          const res = await write(tx, "your appeal", "appeal", [x.id, mine.entry_id, note.value.trim()], BigInt(x.appeal_bond));
+          if (res && res.entry_id) { toast(res.material ? `Appeal upheld: ${pts(res.old_total)} to ${pts(res.new_total)}, bond refunded` : `Appeal rejected: re-score ${pts(res.new_total)}, bond added to prizes`, !res.material); refresh(); }
+        }) }));
+    } else if (mine) act.push(h("p", { class: "callout small", style: "margin-top:10px", text: "You already appealed this entry." }));
+  } else if (ph === "toFinal") {
+    act.push(h("p", { class: "small muted", text: "Appeals are closed. Finalize pays the top three, refunds entry bonds and returns any unused share to the sponsor. Anyone can run it." }),
+      h("button", { class: "btn btn-primary block", type: "button", style: "margin-top:14px", text: "Finalize and pay winners", onclick: (ev) => runButton(ev.currentTarget, async () => {
+        const top = board.rows.filter((r) => r.rank && r.rank <= 3);
+        if (!(await confirmAction({ title: "Pay the winners?", intro: "This sends GEN from the contract and cannot be undone.",
+          rows: [...top.map((r) => [`${r.rank}. ${r.team}`, genStr(r.prize) + " GEN"]), ["Back to sponsor", genStr(board.unused_to_sponsor) + " GEN"]], confirm: "Finalize and pay" }))) return;
+        if (await write(tx, "finalize", "finalize", [x.id])) { toast("Winners paid"); refresh(); }
+      }) }));
+  } else if (ph === "final") {
+    act.push(x.payouts.length ? h("dl", { class: "dl" }, x.payouts.map((p) => [h("dt", { text: `${p.rank}. ${p.team}` }), h("dd", { text: genStr(p.amount) + " GEN" })]),
+      h("dt", { text: "Back to sponsor" }), h("dd", { text: genStr(x.returned_to_sponsor) + " GEN" }), h("dt", { text: "Bonds refunded" }), h("dd", { text: genStr(x.bond_refunds) + " GEN" }))
+      : h("p", { class: "small muted", text: `No eligible entries. ${genStr(x.returned_to_sponsor)} GEN went back to the sponsor.` }));
+  } else act.push(h("p", { class: "small muted", text: "The sponsor cancelled this hackathon before anyone entered." }));
+  const actTitle = { open: "Enter", toJudge: "Judge", judging: "Judge", toClose: "Close out", appeals: "Appeals", toFinal: "Payout", final: "Payout", cancelled: "Cancelled" }[ph];
+  const needsWallet = (ph === "open" && !me) || (ph === "appeals" && !me);
+  const held = BigInt(x.held || 0);
+  put(root,
+    h("div", { class: "detail" },
+      h("div", { class: "stack" },
+        h("section", { class: "panel dhead" },
+          h("div", { class: "row between" }, h("div", { class: "row" }, phaseChip(x), h("span", { class: "xs", text: x.id })), h("button", { class: "btn btn-quiet sm", type: "button", onclick: () => copyText(location.href) }, icon("link", 16), "Copy link")),
+          h("h1", { text: x.title }),
+          x.brief ? h("p", { class: "muted measure", text: x.brief }) : null,
+          h("p", { class: "xs" }, "Sponsor ", h("span", { class: "addr", text: short(x.sponsor) }), `, created ${timeAgo(x.created_at)}`),
+          h("div", { class: "bigprize" }, genStr(x.prize_pool), h("small", { text: "GEN prize pool" })),
+          BigInt(x.forfeits) > 0n ? h("p", { class: "xs", text: `Includes ${genStr(x.forfeits)} GEN from forfeited bonds.` }) : null,
+          h("div", { class: "split" }, (ph === "final" ? [1, 2, 3].map((r) => x.payouts.find((p) => p.rank === r)?.amount || "0") : x.prize_split).map((w, i) => h("div", {}, h("b", { text: genStr(w) + " GEN" }), h("span", { text: ["1st, 50%", "2nd, 30%", "3rd, 20%"][i] })))),
+          h("div", { style: "margin-top:8px" }, phaseTrack(x))),
+        h("section", { class: "panel", "aria-labelledby": "lbT" }, h("div", { class: "sechead", style: "margin-bottom:6px" }, h("h2", { id: "lbT", text: "Leaderboard" }), h("span", { class: "xs", text: `${x.entry_count} of ${state.cfg.max_entries} entries` })), leaderboard(x, board)),
+        h("section", { class: "panel", "aria-labelledby": "rbT" }, h("h2", { id: "rbT", text: "Public rubric" }),
+          h("ul", { class: "rubric" }, x.rubric.map((c) => h("li", {}, h("div", { class: "rt" }, h("span", { text: c.name }), h("span", { class: "num", text: c.weight + "%" })),
+            c.detail ? h("p", { class: "rd", text: c.detail }) : null, h("div", { class: "meter" }, h("i", { style: `width:${c.weight}%` }))))))),
+      h("aside", { class: "side stack" },
+        h("section", { class: "panel", "aria-labelledby": "actT" }, h("h2", { id: "actT", text: actTitle }), h("div", { style: "margin-top:10px" }, needsWallet && !client ? connectPrompt(ph === "open" ? "Connect a wallet to enter this hackathon." : "Connect the wallet that submitted an entry to appeal it.") : act), err, tx.el),
+        h("section", { class: "panel", "aria-labelledby": "accT" }, h("h2", { id: "accT", text: "Accounting" }),
+          h("dl", { class: "dl" },
+            h("dt", { text: "Prize posted" }), h("dd", { text: genStr(x.prize_initial) + " GEN" }),
+            h("dt", { text: "Forfeits added" }), h("dd", { text: genStr(x.forfeits) + " GEN" }),
+            h("dt", { text: "Entry bonds held" }), h("dd", { text: genStr(x.bonds_held) + " GEN" }),
+            h("dt", { text: "Held by contract" }), h("dd", { text: genStr(held) + " GEN" }),
+            h("dt", { text: "Bonds" }), h("dd", { text: `${genStr(x.entry_bond)} entry, ${genStr(x.appeal_bond)} appeal` }))))));
+}
+
+/* ---------- entry detail ---------- */
+async function viewEntry(root, hid, eid) {
+  if (gate(root)) return;
+  put(root, skel(160), skel(260));
+  let x, e;
+  try { [x, e] = await Promise.all([readJson("get_hackathon", [hid]), readJson("get_entry", [hid, eid])]); }
+  catch (err) { put(root, h("div", { class: "panel stack", role: "alert" }, h("h1", { text: "Entry not found" }), h("p", { class: "muted", text: explain(err) }), h("a", { class: "btn btn-secondary", href: "#/h/" + hid, text: "Back to the hackathon" }))); return; }
+  const ap = e.appeal;
+  const ext = (href, text, ic) => h("a", { class: "linkrow", href, target: "_blank", rel: "noopener" }, icon(ic), h("span", { text }), icon("ext", 16));
+  const commitUrl = e.commit ? `${e.repo_url}/tree/${e.commit}` : e.repo_url;
+  put(root,
+    h("a", { class: "btn btn-quiet sm", href: "#/h/" + hid, style: "margin:0 0 10px -10px" }, icon("back", 16), x.title),
+    h("div", { class: "detail" },
+      h("div", { class: "stack" },
+        h("section", { class: "panel dhead" },
+          h("div", { class: "row" }, entryChip(e.status), h("span", { class: "xs", text: `${hid}/${e.id}` }), e.rank ? h("span", { class: "rank top", text: String(e.rank) }) : null),
+          h("h1", { text: e.team }),
+          h("p", { class: "xs" }, "Submitted by ", h("span", { class: "addr", text: short(e.owner) }), ` ${timeAgo(e.submitted_at)}`, e.judged_at ? `, judged ${timeAgo(e.judged_at)}` : ""),
+          h("div", { class: "bigprize" }, e.status === "PENDING" ? "–" : pts(e.total), h("small", { text: "out of 100" })),
+          BigInt(e.prize || 0) > 0n ? h("p", { class: "callout small", text: `Won ${genStr(e.prize)} GEN.` }) : null),
+        h("section", { class: "panel", "aria-labelledby": "scT" }, h("h2", { id: "scT", text: "Scores and reasons" }),
+          e.status === "PENDING" ? h("p", { class: "muted small", text: "Not judged yet. Scores appear after someone runs the judge." }) : scoreBars(e)),
+        ap ? h("section", { class: "panel", "aria-labelledby": "apT" }, h("h2", { id: "apT", text: ap.outcome === "REFUNDED" ? "Appeal upheld" : "Appeal rejected" }),
+          h("div", { class: "cmp", style: "margin-top:12px" }, h("div", {}, h("span", { class: "xs", text: "Before" }), h("b", { text: pts(ap.old_total) })), h("div", {}, h("span", { class: "xs", text: "Re-score" }), h("b", { text: pts(ap.new_total) }))),
+          ap.note ? h("p", { class: "small muted", style: "margin-top:12px", text: "Team note: " + ap.note }) : null,
+          h("p", { class: "small", style: "margin-top:8px", text: ap.outcome === "REFUNDED" ? `The change was 10 points or more, so the re-score replaced the original and the ${genStr(ap.bond)} GEN bond was refunded.` : `The change was under 10 points, so the original score stands and the ${genStr(ap.bond)} GEN bond joined the prize pool.` }),
+          h("p", { class: "xs", style: "margin-top:6px", text: `Filed ${timeAgo(ap.at)}. Re-score per criterion: ${ap.new_scores.join(" / ")}.` })) : null),
+      h("aside", { class: "side stack" },
+        h("section", { class: "panel", "aria-labelledby": "evT" }, h("h2", { id: "evT", text: "Evidence" }),
+          ext(commitUrl, e.repo_url.replace("https://github.com/", "") + (e.commit ? " at " + e.commit.slice(0, 8) : ""), "code"),
+          ext(e.demo_url, e.demo_url.replace("https://", ""), "play"),
+          e.readme_source ? ext(e.readme_source, "README as judged", "list") : null,
+          e.status !== "PENDING" ? h("p", { class: "xs", style: "margin-top:6px", text: `README ${e.readme_ok ? "read" : "not readable"}, demo ${e.demo_ok ? "read" : "not readable"}.` }) : null),
+        h("section", { class: "panel", "aria-labelledby": "bdT" }, h("h2", { id: "bdT", text: "Bond" }),
+          h("dl", { class: "dl" }, h("dt", { text: "Entry bond" }), h("dd", { text: genStr(e.bond) + " GEN" }), h("dt", { text: "Status" }), h("dd", { text: { HELD: "Held", REFUNDED: "Refunded", FORFEITED: "Forfeited to prizes" }[e.bond_status] || e.bond_status })),
+          phaseOf(x) === "appeals" && account && account.toLowerCase() === e.owner && !ap ? h("a", { class: "btn btn-primary block", href: "#/h/" + hid, style: "margin-top:14px", text: "Appeal this score" }) : null))));
+}
+
+/* ---------- mine ---------- */
+async function viewMine(root) {
+  if (gate(root)) return;
+  put(root, h("div", { class: "pagehead" }, h("div", {}, h("h1", { text: "Mine" }), h("p", { text: "Hackathons you sponsor, entries you submitted and refunds waiting for you." }))));
+  if (!account) { root.appendChild(h("div", { class: "measure" }, connectPrompt("Connect a wallet to see your hackathons and entries."))); return; }
+  const box = h("div", {}, skel(120, 2));
+  root.appendChild(box);
+  let a;
+  try { a = await readJson("get_account", [account]); } catch (e) { put(box, h("p", { class: "err", text: explain(e) })); return; }
+  const tx = txPanel();
+  const owed = BigInt(a.owed);
+  put(box, h("div", { class: "detail" },
+    h("div", { class: "stack" },
+      h("section", { class: "panel", "aria-labelledby": "meE" }, h("h2", { id: "meE", text: "My entries" }),
+        a.entries.length ? h("ol", { class: "rows" }, a.entries.slice().reverse().map((e) => h("li", {}, h("a", { href: `#/h/${e.hackathon_id}/${e.entry_id}` },
+          e.rank ? h("span", { class: "rank top", text: String(e.rank) }) : h("span", { class: "rank", text: "–" }),
+          h("span", { style: "min-width:0" }, h("span", { class: "t", text: `${e.team} in ${e.hackathon_title}` }), h("span", { class: "s", text: `${e.hackathon_id}/${e.entry_id}, ${(ENTRY[e.status] || [e.status])[0].toLowerCase()}${e.appealed ? ", appealed" : ""}` })),
+          h("span", { class: "e" }, h("b", { text: e.status === "PENDING" ? "–" : pts(e.total) }), h("span", { class: "xs", text: BigInt(e.prize) > 0n ? genStr(e.prize) + " GEN won" : "" }))))))
+          : h("div", { class: "empty" }, h("h3", { text: "No entries yet" }), h("p", { class: "small", text: "Pick an open hackathon and submit your repo." }), h("a", { class: "btn btn-primary", href: "#/hackathons?f=open", text: "Find an open hackathon" }))),
+      h("section", { class: "panel", "aria-labelledby": "meS" }, h("h2", { id: "meS", text: "Hackathons I sponsor" }),
+        a.sponsored.length ? h("div", { style: "margin-top:12px" }, hackGrid(a.sponsored.slice().reverse()))
+          : h("div", { class: "empty" }, h("h3", { text: "Nothing sponsored yet" }), h("a", { class: "btn btn-primary", href: "#/host", text: "Host a hackathon" })))),
+    h("aside", { class: "side" }, h("section", { class: "panel", "aria-labelledby": "meR" }, h("h2", { id: "meR", text: "Refunds" }),
+      h("p", { class: "small muted", text: "Refused payments and overpayments are credited here." }),
+      h("div", { class: "bigprize", style: "margin-top:10px" }, genStr(a.owed), h("small", { text: "GEN to withdraw" })),
+      h("button", { class: "btn btn-primary block", type: "button", style: "margin-top:12px", disabled: owed > 0n ? null : true, text: "Withdraw", onclick: (ev) => runButton(ev.currentTarget, async () => {
+        if (!(await confirmAction({ title: "Withdraw refunds?", rows: [["Amount", genStr(a.owed) + " GEN"], ["To", short(account)]], confirm: "Withdraw" }))) return;
+        if (await write(tx, "the withdrawal", "withdraw", [])) { toast("Withdrawn"); setTimeout(() => viewMine(root), 1200); }
+      }) }), tx.el))));
+}
+
+/* ---------- router ---------- */
+const TABS = [["", "home", "Home"], ["hackathons", "trophy", "Hackathons"], ["host", "plus", "Host"], ["mine", "user", "Mine"]];
+function drawTabs(active) {
+  put($("tabs"), TABS.map(([path, ic, text]) => h("li", {}, h("a", { href: "#/" + path, "aria-current": active === path ? "page" : null }, icon(ic), h("span", { text })))));
+}
+let routeSeq = 0, firstRoute = true;
+async function route() {
+  const seq = ++routeSeq;
+  if (dlg.open) closeDialog(false);
+  const [pathRaw, query = ""] = (location.hash || "#/").slice(2).split("?");
+  const params = new URLSearchParams(query);
+  const parts = pathRaw.split("/").filter(Boolean).map(decodeURIComponent);
+  const name = parts[0] === "h" ? "hackathons" : parts[0] || "";
+  drawTabs(TABS.some((t) => t[0] === name) ? name : "");
+  document.title = parts[0] === "h" ? `${parts.slice(1).join("/")} – HackJudge` : name ? `${TABS.find((t) => t[0] === name)?.[2] || "HackJudge"} – HackJudge` : "HackJudge";
+  const root = $("app");
+  if (hasContract && !state.cfg && !state.bootError) { put(root, skel(140), skel(220)); await boot(); }
+  if (seq !== routeSeq) return;
+  window.scrollTo(0, 0);
+  try {
+    if (parts[0] === "h" && parts[2]) await viewEntry(root, parts[1], parts[2]);
+    else if (parts[0] === "h" && parts[1]) await viewHackathon(root, parts[1]);
+    else if (name === "hackathons") await viewList(root, params);
+    else if (name === "host") await viewHost(root, params);
+    else if (name === "mine") await viewMine(root);
+    else await viewHome(root);
+    if (!firstRoute) root.focus({ preventScroll: true });
+    firstRoute = false;
+  } catch (e) {
+    put(root, h("div", { class: "panel stack", role: "alert" }, h("h1", { text: "This page could not be shown" }), h("p", { class: "muted", text: explain(e) }),
+      h("button", { class: "btn btn-primary", type: "button", text: "Reload", onclick: () => route() })));
+  }
+}
+window.addEventListener("hashchange", route);
+if (readTestKey()) { try { startTestSession(true); } catch (e) { writeTestKey(""); } }
+drawWallet();
+route();
+</script>
+</body>
+</html>
