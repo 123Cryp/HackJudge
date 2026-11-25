@@ -76,10 +76,12 @@ nav.tabs a:hover{color:var(--ink)}
 nav.tabs a[aria-current="page"]{color:var(--ink)}
 nav.tabs a[aria-current="page"] svg{color:var(--accent)}
 nav.tabs .side-brand,nav.tabs .side-foot{display:none}
-main{padding:20px 14px 48px;max-width:1140px;margin:0 auto;min-height:70vh}
+main{padding:20px 14px 48px;max-width:1140px;margin:0 auto}
 main:focus{outline:none}
 footer.foot{max-width:1140px;margin:0 auto;padding:0 14px 32px;font-size:12.5px;color:var(--ink-3)}
 footer.foot p+p{margin-top:4px}
+footer.foot .frow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+footer.foot .frow a{display:inline-flex;align-items:center;min-height:36px}
 @media (min-width:1024px){
   body{padding-bottom:0;padding-left:var(--side-w)}
   .topbar{padding:0 32px}
@@ -110,7 +112,8 @@ footer.foot p+p{margin-top:4px}
 .inset{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-md);padding:14px}
 .pagehead{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
 .pagehead p{margin-top:6px;color:var(--ink-2);max-width:62ch}
-.section{margin-top:40px}
+.section{margin-top:24px}
+@media (min-width:700px){.section{margin-top:40px}}
 .sechead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
 .sechead h2{font-size:21px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:var(--r-sm);border:1px solid transparent;font:inherit;font-size:15px;font-weight:650;
@@ -214,7 +217,9 @@ dialog::backdrop{background:rgba(10,14,20,.5)}
 .hero h1{font-size:clamp(26px,5vw,36px);letter-spacing:-.025em;margin-top:14px;max-width:18ch}
 .lede{margin-top:12px;color:var(--ink-2);font-size:16.5px;max-width:52ch}
 .hero .actions{margin-top:20px}
-.hero-art{display:flex;justify-content:center}
+@media (max-width:759px){.hero .actions{display:none}.hero-grid{padding-bottom:14px}.stats>div{padding:10px 14px}.sentence+.chips .tok{flex:1 1 calc(50% - 8px);justify-content:space-between}}
+.hero-art{display:none;justify-content:center}
+@media (min-width:860px){.hero-art{display:flex}}
 .hero-art svg{width:100%;max-width:380px;height:auto}
 .hero-art .bar{transform-origin:left center;transform:scaleX(0);animation:fill .9s cubic-bezier(.2,.7,.2,1) forwards}
 .hero-art .bar.b2{animation-delay:.15s}.hero-art .bar.b3{animation-delay:.3s}.hero-art .bar.b4{animation-delay:.45s}
@@ -261,8 +266,10 @@ dialog::backdrop{background:rgba(10,14,20,.5)}
 .role span.d{display:block;font-size:13.5px;color:var(--ink-2);margin-top:2px}
 .role>svg.ic{color:var(--ink-3)}
 .role:hover>svg.ic{color:var(--accent)}
-.sentence{font-size:clamp(18px,3.4vw,22px);line-height:2.15;font-weight:600;letter-spacing:-.01em;max-width:46ch}
-.tok{display:inline-flex;align-items:center;gap:4px;min-height:38px;padding:0 12px;margin:0 2px;border-radius:var(--r-sm);border:1px dashed var(--accent);background:var(--accent-soft);color:var(--ink);
+.sentence{font-size:16.5px;line-height:1.5;font-weight:600;max-width:52ch}
+.sentence+.chips{margin-top:12px}
+.testnote{margin-top:8px}
+.tok{display:inline-flex;align-items:center;gap:4px;min-height:38px;padding:0 12px;margin:0;border-radius:var(--r-sm);border:1px dashed var(--accent);background:var(--accent-soft);color:var(--ink);
   font:inherit;font-size:.92em;font-weight:650;cursor:pointer;line-height:1.2;vertical-align:baseline}
 .tok:hover{border-style:solid}
 .tok svg.ic{width:14px;height:14px;color:var(--accent)}
@@ -281,14 +288,16 @@ details.how[open]>summary .ic{transform:rotate(180deg)}
 .grid{display:grid;gap:12px;grid-template-columns:minmax(0,1fr)}
 @media (min-width:700px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (min-width:1200px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-.hcard{--edge:var(--line-2);position:relative;display:flex;flex-direction:column;gap:10px;padding:16px;background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--edge);
+.hcard{--edge:var(--line-2);position:relative;overflow:hidden;display:flex;flex-direction:column;gap:10px;padding:19px 16px 16px;background:var(--surface);border:1px solid var(--line);
   border-radius:var(--r-lg);box-shadow:var(--shadow);text-decoration:none;color:var(--ink);min-width:0}
-.hcard:hover{border-color:var(--line-2);border-top-color:var(--edge);color:var(--ink)}
+.hcard::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--edge)}
+.hcard:hover{border-color:var(--line-2);color:var(--ink)}
+.hcard .btn{align-self:flex-start;margin-top:auto;pointer-events:none}
 .hcard.ok{--edge:var(--ok)}.hcard.warn{--edge:var(--warn)}.hcard.info{--edge:var(--info)}.hcard.bad{--edge:var(--bad)}.hcard.neutral{--edge:var(--ink-3)}
 .hcard h3{font-size:17px;overflow-wrap:anywhere}
 .hcard .prize{font-size:24px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .hcard .prize small{font-size:13px;color:var(--ink-3);margin-left:4px}
-.hcard .meta{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--ink-2)}
+.hcard .meta{font-size:13px;color:var(--ink-2)}
 .hcard .meta span{display:inline-flex;align-items:center;gap:5px}
 .hcard .meta svg.ic{width:15px;height:15px;color:var(--ink-3)}
 .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
@@ -369,7 +378,7 @@ table.board a:hover{color:var(--accent)}
 </nav>
 <main id="app" tabindex="-1"></main>
 <footer class="foot">
-  <p>Contract <span class="addr" id="footAddr">not set</span> on GenLayer Studio.</p>
+  <div class="frow"><span>Contract <span class="addr" id="footAddr">not set</span></span><button class="btn btn-quiet sm" type="button" id="footCopy" hidden>Copy</button><a id="footExp" href="#" target="_blank" rel="noopener" hidden>Explorer</a><span>on GenLayer Studio</span></div>
   <p>Scores come from validators reading each team's README and demo page against the hackathon's public rubric.</p>
 </footer>
 <dialog id="dlg" aria-labelledby="dlgTitle"><div class="dlg" id="dlgBody"></div></dialog>
@@ -544,7 +553,12 @@ function resolveContract() {
 }
 const CONTRACT_ADDRESS = resolveContract();
 const hasContract = CONTRACT_ADDRESS.toLowerCase() !== ZERO;
-$("footAddr").textContent = hasContract ? CONTRACT_ADDRESS : "not set";
+$("footAddr").textContent = hasContract ? short(CONTRACT_ADDRESS) : "not set";
+if (hasContract) {
+  $("footAddr").title = CONTRACT_ADDRESS;
+  $("footCopy").hidden = false; $("footCopy").addEventListener("click", () => copyText(CONTRACT_ADDRESS));
+  $("footExp").hidden = false; $("footExp").href = "https://explorer-studio.genlayer.com/address/" + CONTRACT_ADDRESS;
+}
 $("sideFoot").textContent = hasContract ? "Contract " + short(CONTRACT_ADDRESS) : "No contract set";
 
 /* ---------- wallet and network ---------- */
@@ -650,6 +664,7 @@ function confirmAction({ title, intro, rows = [], note, confirm, danger }) {
       intro ? h("p", { class: "muted", text: intro }) : null,
       rows.length ? h("dl", { class: "dl", style: "margin-top:16px" }, rows.map(([k, v]) => [h("dt", { text: k }), h("dd", { text: v })])) : null,
       note ? h("p", { class: "callout small", style: "margin-top:16px", text: note }) : null,
+      h("p", { class: "xs testnote", text: "Test network: GEN here has no real value." }),
       h("div", { class: "actions", style: "margin-top:22px" },
         h("button", { class: "btn btn-secondary", type: "button", text: "Go back", onclick: () => closeDialog(false) }),
         h("button", { class: "btn " + (danger ? "btn-danger" : "btn-primary"), type: "button", id: "dlgOk", text: confirm, onclick: () => closeDialog(true) })));
@@ -879,7 +894,7 @@ function phaseOf(x, now = nowSec()) {
 }
 const PHASE = {
   open: ["Open for entries", "ok"], toJudge: ["Ready to judge", "warn"], toClose: ["Closed, no entries", "warn"], judging: ["Judging", "warn"],
-  appeals: ["Appeals open", "info"], toFinal: ["Ready to finalize", "info"], final: ["Finalized", "neutral"], cancelled: ["Cancelled", "bad"],
+  appeals: ["Appeals open", "info"], toFinal: ["Ready to finalize", "info"], final: ["Finalized", "neutral"], cancelled: ["Cancelled", "warn"],
 };
 const chip = (text, tone) => h("span", { class: "chip " + (tone || ""), text });
 const phaseChip = (x) => { const [t, tone] = PHASE[phaseOf(x)]; return chip(t, tone); };
@@ -892,16 +907,17 @@ function connectPrompt(text) {
 function hackCard(x) {
   const ph = phaseOf(x);
   const [, tone] = PHASE[ph];
-  const timing = ph === "open" ? ["clock", h("span", {}, "Closes in ", countdown(x.deadline, "now"))]
-    : ph === "appeals" ? ["scale", h("span", {}, "Appeals close in ", countdown(x.appeal_ends, "now"))]
-    : ph === "final" ? ["check", h("span", { text: "Finalized " + timeAgo(x.finalized_at) })]
-    : ["clock", h("span", { text: PHASE[ph][0] })];
+  const timing = ph === "open" ? h("span", {}, "Closes in ", countdown(x.deadline, "now"))
+    : ph === "appeals" ? h("span", {}, "Appeals close in ", countdown(x.appeal_ends, "now"))
+    : ph === "final" ? h("span", { text: "Finalized " + timeAgo(x.finalized_at) })
+    : h("span", { text: PHASE[ph][0] });
+  const cta = ph === "open" ? "Enter now" : ph === "final" ? "See results" : "View details";
   return h("a", { class: "hcard " + tone, href: "#/h/" + x.id },
-    h("div", { class: "row between" }, phaseChip(x), h("span", { class: "xs", text: x.id })),
+    h("div", {}, phaseChip(x)),
     h("h3", { text: x.title }),
     h("div", { class: "prize" }, genStr(x.prize_pool), h("small", { text: "GEN prize pool" })),
-    h("div", { class: "tags" }, x.criteria.map((c) => h("span", { class: "tag", text: c }))),
-    h("div", { class: "meta" }, h("span", {}, icon("users"), `${x.entry_count} ${x.entry_count === 1 ? "entry" : "entries"}`), h("span", {}, icon(timing[0]), timing[1])));
+    h("p", { class: "meta" }, `${x.entry_count} ${x.entry_count === 1 ? "entry" : "entries"}`, " · ", timing),
+    h("span", { class: "btn btn-secondary sm", "aria-hidden": "true", text: cta }));
 }
 function hackGrid(items) { return h("div", { class: "grid" }, items.map(hackCard)); }
 
@@ -915,7 +931,7 @@ const EVENTS = {
   APPEAL_UPHELD: ["scale", "ok", (e) => `Appeal upheld on ${e.entry}`, (e) => `${e.detail}; bond refunded`],
   APPEAL_REJECTED: ["scale", "warn", (e) => `Appeal rejected on ${e.entry}`, (e) => `${e.detail}; bond added to prizes`],
   FINALIZED: ["coin", "acc", (e) => `${genStr(e.amount)} GEN paid to winners`, (e) => e.detail],
-  CANCELLED: ["back", "bad", () => "Hackathon cancelled", (e) => e.detail],
+  CANCELLED: ["back", "warn", () => "Hackathon cancelled", (e) => e.detail],
 };
 function feedItem(e) {
   const [ic, tone, title, sub] = EVENTS[e.kind] || ["list", "", () => e.kind, () => e.detail];
@@ -953,13 +969,15 @@ async function viewHome(root) {
   const feedFoot = h("div", { class: "feed-foot" });
   const latest = h("div", {}, skel(150, 1));
   const sentence = h("p", { class: "sentence" });
+  const chipsRow = h("div", { class: "chips" });
   const drawSentence = () => {
     const tok = (label, onclick) => h("button", { class: "tok", type: "button", onclick }, label, icon("down"));
-    put(sentence, "Host a ", tok(`${draft.prize.toLocaleString("en-US")} GEN`, async () => { const v = await pickFrom("Prize pool", PRIZES, draft.prize); if (v !== null) { draft.prize = v; drawSentence(); } }),
-      " prize pool, open for ", tok(minutesLabel(draft.window), async () => { const v = await pickFrom("Submission window", WINDOWS, draft.window); if (v !== null) { draft.window = v; drawSentence(); } }),
-      ", judged on ", tok(RUBRICS[draft.rubric].label, async () => { const v = await pickFrom("Rubric", Object.entries(RUBRICS).map(([k, r]) => [k, r.label]), draft.rubric); if (v !== null) { draft.rubric = v; drawSentence(); } }),
-      ", with ", tok(minutesLabel(draft.appeal), async () => { const v = await pickFrom("Appeal window", APPEALS, draft.appeal); if (v !== null) { draft.appeal = v; drawSentence(); } }),
-      " for appeals.");
+    put(sentence, `Host a ${draft.prize.toLocaleString("en-US")} GEN prize pool, open for ${minutesLabel(draft.window)}, judged on ${RUBRICS[draft.rubric].label}, with ${minutesLabel(draft.appeal)} for appeals.`);
+    put(chipsRow,
+      tok(`Prize ${draft.prize.toLocaleString("en-US")} GEN`, async () => { const v = await pickFrom("Prize pool", PRIZES, draft.prize); if (v !== null) { draft.prize = v; drawSentence(); } }),
+      tok(`Open ${minutesLabel(draft.window)}`, async () => { const v = await pickFrom("Submission window", WINDOWS, draft.window); if (v !== null) { draft.window = v; drawSentence(); } }),
+      tok(RUBRICS[draft.rubric].label, async () => { const v = await pickFrom("Rubric", Object.entries(RUBRICS).map(([k, r]) => [k, r.label]), draft.rubric); if (v !== null) { draft.rubric = v; drawSentence(); } }),
+      tok(`Appeals ${minutesLabel(draft.appeal)}`, async () => { const v = await pickFrom("Appeal window", APPEALS, draft.appeal); if (v !== null) { draft.appeal = v; drawSentence(); } }));
   };
   drawSentence();
   const role = (kind, title, desc, href) => h("a", { class: "role", href }, h("span", { class: "tile" }, roleArt(kind)),
@@ -969,10 +987,16 @@ async function viewHome(root) {
       h("div", { class: "hero-grid" },
         h("div", {}, live,
           h("h1", { id: "heroTitle", text: "Hackathon prizes, judged in the open." }),
-          h("p", { class: "lede", text: "Sponsors lock a prize pool and publish a weighted rubric. After the deadline, validators read every README and demo, score each criterion from 0 to 10, and pay the top three 50, 30 and 20 percent." }),
+          h("p", { class: "lede", text: "A public rubric, validator scores and prizes paid on the result." }),
           h("div", { class: "actions" }, h("a", { class: "btn btn-primary", href: "#/host", text: "Host a hackathon" }), h("a", { class: "btn btn-secondary", href: "#/hackathons", text: "Browse hackathons" }))),
         h("div", { class: "hero-art" }, heroArt())),
       stats),
+    h("section", { class: "section", "aria-labelledby": "composeTitle" },
+      h("div", { class: "sechead" }, h("h2", { id: "composeTitle", text: "Host in one sentence" })),
+      h("div", { class: "panel" }, h("p", { class: "xs", style: "margin-bottom:6px", text: "Tap a chip to change it." }), sentence, chipsRow,
+        h("p", { class: "xs testnote", text: "Teams enter with a 2 GEN bond and an appeal costs 5 GEN. Test network: GEN here has no real value." }),
+        h("div", { class: "actions", style: "margin-top:16px" },
+          h("a", { class: "btn btn-primary", href: "#/host", onclick: (ev) => { ev.preventDefault(); location.hash = `#/host?prize=${draft.prize}&window=${draft.window}&rubric=${draft.rubric}&appeal=${draft.appeal}`; } }, "Continue to details", icon("arrow", 18))))),
     h("section", { class: "section", "aria-labelledby": "feedTitle" },
       h("div", { class: "sechead" }, h("h2", { id: "feedTitle", text: "Live contract activity" }), h("span", { class: "xs", text: "Read from the contract" })),
       h("div", { class: "panel feed" }, feedList, feedFoot)),
@@ -982,13 +1006,8 @@ async function viewHome(root) {
         role("sponsor", "Sponsor a prize", "Lock GEN, publish the rubric and let validators judge.", "#/host"),
         role("team", "Enter with your repo", "Submit a GitHub repo and a demo link with a small bond.", "#/hackathons?f=open"),
         role("judge", "Check the scores", "Run the judge, read every reason and follow appeals.", "#/hackathons?f=review"))),
-    h("section", { class: "section", "aria-labelledby": "composeTitle" },
-      h("div", { class: "sechead" }, h("h2", { id: "composeTitle", text: "Set up a hackathon in one sentence" })),
-      h("div", { class: "panel" }, h("p", { class: "xs", style: "margin-bottom:6px", text: "Tap a highlighted part to change it." }), sentence,
-        h("div", { class: "actions", style: "margin-top:16px" },
-          h("a", { class: "btn btn-primary", href: "#/host", onclick: (ev) => { ev.preventDefault(); location.hash = `#/host?prize=${draft.prize}&window=${draft.window}&rubric=${draft.rubric}&appeal=${draft.appeal}`; } }, "Continue to details", icon("arrow", 18))))),
     h("section", { class: "section" },
-      h("details", { class: "how", open: true },
+      h("details", { class: "how", open: matchMedia("(min-width:760px)").matches },
         h("summary", {}, h("h2", { text: "How judging works" }), icon("down")),
         h("ol", { class: "steps" },
           [["Post the prize", "The sponsor locks GEN and a rubric of up to five weighted criteria. Teams see it before they enter."],
@@ -1012,7 +1031,7 @@ async function viewHome(root) {
   put(live, h("i", { "aria-hidden": "true" }), h("span", {}, h("b", { text: String(st.open) }), st.open === 1 ? " hackathon open for entries" : " hackathons open for entries"));
   stats.removeAttribute("aria-busy");
   put(stats,
-    h("div", {}, h("dt", { text: "Live prize pools" }), h("dd", {}, genStr(st.live_prize_pool), h("small", { text: "GEN" })), h("span", { class: "sub acc", text: `${st.open + st.judging + st.appeals} active` })),
+    h("div", {}, h("dt", { text: "Live prize pools" }), h("dd", {}, genStr(st.live_prize_pool), h("small", { text: "GEN" })), h("span", { class: "sub ok", text: `${st.open + st.judging + st.appeals} active` })),
     h("div", {}, h("dt", { text: "Hackathons" }), h("dd", { text: String(st.hackathons) }), h("span", { class: "sub info", text: `${st.finalized} finalized` })),
     h("div", {}, h("dt", { text: "Entries judged" }), h("dd", { text: String(st.scored + st.unreachable) }), h("span", { class: "sub warn", text: `${st.appeals_filed} appeal${st.appeals_filed === 1 ? "" : "s"} filed` })),
     h("div", {}, h("dt", { text: "Paid to winners" }), h("dd", {}, genStr(st.prizes_paid), h("small", { text: "GEN" })), h("span", { class: "sub ok", text: `${genStr(st.returned_to_sponsors)} GEN back to sponsors` })));
@@ -1346,7 +1365,7 @@ async function viewMine(root) {
       h("section", { class: "panel", "aria-labelledby": "meE" }, h("h2", { id: "meE", text: "My entries" }),
         a.entries.length ? h("ol", { class: "rows" }, a.entries.slice().reverse().map((e) => h("li", {}, h("a", { href: `#/h/${e.hackathon_id}/${e.entry_id}` },
           e.rank ? h("span", { class: "rank top", text: String(e.rank) }) : h("span", { class: "rank", text: "–" }),
-          h("span", { style: "min-width:0" }, h("span", { class: "t", text: `${e.team} in ${e.hackathon_title}` }), h("span", { class: "s", text: `${e.hackathon_id}/${e.entry_id}, ${(ENTRY[e.status] || [e.status])[0].toLowerCase()}${e.appealed ? ", appealed" : ""}` })),
+          h("span", { style: "min-width:0" }, h("span", { class: "t", text: `${e.team} in ${e.hackathon_title}` }), h("span", { class: "s", text: [(ENTRY[e.status] || [e.status])[0], e.appealed ? "Appealed" : null].filter(Boolean).join(" · ") })),
           h("span", { class: "e" }, h("b", { text: e.status === "PENDING" ? "–" : pts(e.total) }), h("span", { class: "xs", text: BigInt(e.prize) > 0n ? genStr(e.prize) + " GEN won" : "" }))))))
           : h("div", { class: "empty" }, h("h3", { text: "No entries yet" }), h("p", { class: "small", text: "Pick an open hackathon and submit your repo." }), h("a", { class: "btn btn-primary", href: "#/hackathons?f=open", text: "Find an open hackathon" }))),
       h("section", { class: "panel", "aria-labelledby": "meS" }, h("h2", { id: "meS", text: "Hackathons I sponsor" }),
@@ -1362,6 +1381,17 @@ async function viewMine(root) {
 }
 
 /* ---------- router ---------- */
+
+const MOVES = /^(Lock prize|Enter with|Appeal with|Finalize and pay|Withdraw$)/;
+function addTestNotes() {
+  document.querySelectorAll("#app button.btn").forEach((b) => {
+    if (!MOVES.test(b.textContent.trim())) return;
+    const n = b.nextElementSibling;
+    if (n && n.classList.contains("testnote")) return;
+    b.insertAdjacentElement("afterend", h("p", { class: "xs testnote", text: "Test network: GEN here has no real value." }));
+  });
+}
+new MutationObserver(addTestNotes).observe($("app"), { childList: true, subtree: true });
 const TABS = [["", "home", "Home"], ["hackathons", "trophy", "Hackathons"], ["host", "plus", "Host"], ["mine", "user", "Mine"]];
 function drawTabs(active) {
   put($("tabs"), TABS.map(([path, ic, text]) => h("li", {}, h("a", { href: "#/" + path, "aria-current": active === path ? "page" : null }, icon(ic), h("span", { text })))));
